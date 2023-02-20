@@ -1,19 +1,19 @@
 %% Directory management
 % folder names
 %--------------------------------------------------------------------------
-config_folder.projectFolder   = 'P:\Sein_Jeung\Project_Watermaze';
-config_folder.dataFolder      = fullfile(config_folder.projectFolder, 'WM_EEG_Data'); 
-config_folder.analysisFolder  = fullfile(config_folder.projectFolder, 'WM_EEG_Analysis'); 
-config_folder.resultsFolder   = fullfile(config_folder.projectFolder, 'WM_EEG_Results');
-config_folder.figuresFolder   = fullfile(config_folder.projectFolder, 'WM_EEG_Figures');
+config_folder.project_folder   = 'P:\Sein_Jeung\Project_Watermaze';
+config_folder.data_folder      = fullfile(config_folder.project_folder, 'WM_EEG_Data'); 
+config_folder.analysis_folder  = fullfile(config_folder.project_folder, 'WM_EEG_Analysis'); 
+config_folder.results_folder   = fullfile(config_folder.project_folder, 'WM_EEG_Results');
+config_folder.figures_folder   = fullfile(config_folder.project_folder, 'WM_EEG_Figures');
 
 % data folder and file names 
 %--------------------------------------------------------------------------
-config_folder.bidsFolder              = '0_BIDS-data';
-config_folder.setFolder               = '1_basic-EEGLAB';
+config_folder.bids_folder              = '0_BIDS-data';
+config_folder.set_folder               = '1_basic-EEGLAB';
     config_folder.rawFileNameEEG              = '_WM_EEG.set'; 
     config_folder.rawFileNameMotion           = '_WM_MOTION_Unity.set'; 
-config_folder.trimmedFolder           = '2_trimmed'; 
+config_folder.trimmed_folder           = '2_trimmed'; 
     config_folder.trimmedFileNameEEG          = '_WM_EEG_trimmed.set';
     config_folder.trimmedFileNameMotion       = '_WM_MOTION_trimmed.set';
 config_folder.preprocessedFolder      = '3_preprocessed';

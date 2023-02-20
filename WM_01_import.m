@@ -11,9 +11,11 @@ eeglab; % start eeglab to add bemobil pipeline to matlab path
 rmpath(fileparts(which('ft_defaults'))) % remove the fieldtrip version that is in the pipeline
 addpath('C:\Users\seinjeung\Documents\GitHub\fieldtrip') % add the modded fieldtrip
 
+WM_config
+
 % data directory
-addpath(fullfile(config_folder.dataFolder, 'source-data'))
-numericalIDs                        = []; % go over all participants
+addpath(fullfile(config_folder.data_folder, 'source-data'))
+numericalIDs                        = [81001:81010]; % go over all participants
 
 % general metadata shared across all modalities
 %--------------------------------------------------------------------------
@@ -121,59 +123,24 @@ subjectInfo.fields.occupation.Levels.collegeuni     = 'college or university stu
 subjectInfo.fields.occupation.Levels.employed       = 'employed';
 subjectInfo.fields.occupation.Levels.other          = 'other';
 
-% subject information
-%--------------------------------------------------------------------------
-% names of the columns - 'nr' column is just the numerical IDs of subjects
-%                         do not change the name of this column
-subjectInfo.cols = {'nr',   'age',  'sex',  'rfpt', 'language', 'education','occupation' };
-subjectInfo.data = cell(numel(numericalIDs),numel(subjectInfo.cols));
-addpath(fullfile(studyFolder, '0_source-data')) 
-
-for Si = 1:numel(numericalIDs)
-    eval(['sub' num2str(numericalIDs(Si)) '_info']);
-    subjectInfo.data{Si,1} = numericalIDs(Si);
-    for Ci = 2:numel(subjectInfo.cols)
-        if strcmp(subjectInfo.cols{Ci}, 'education')
-            switch subjectdata.education
-                case 1
-                    subjectInfo.data{Si,Ci} = 'none'; 
-                case 2
-                    subjectInfo.data{Si,Ci} = 'secondaryHV'; 
-                case 3
-                    subjectInfo.data{Si,Ci} = 'secondaryRP'; 
-                case 4
-                    subjectInfo.data{Si,Ci} = 'highschool'; 
-                case 5 
-                    subjectInfo.data{Si,Ci} = 'university'; 
-                otherwise 
-                    subjectInfo.data{Si,Ci} = 'n/a'; 
-            end
-        elseif strcmp(subjectInfo.cols{Ci}, 'occupation')
-            switch subjectdata.occupation
-                case 1 
-                    subjectInfo.data{Si,Ci} = 'school'; 
-                case 2
-                    subjectInfo.data{Si,Ci} = 'collegeuni'; 
-                case 3
-                    subjectInfo.data{Si,Ci} = 'employed'; 
-                case 4
-                    subjectInfo.data{Si,Ci} = 'other'; 
-                otherwise
-                    subjectInfo.data{Si,Ci} = 'n/a';
-            end
-        else
-            subjectInfo.data{Si,Ci} = subjectdata.(subjectInfo.cols{Ci});
-        end
-    end
-end
+% % subject information
+% %--------------------------------------------------------------------------
+% % names of the columns - 'nr' column is just the numerical IDs of subjects
+% %                         do not change the name of this column
+% subjectInfo.cols = {'nr',   'age',  'sex',  'rfpt', 'language', 'education','occupation' };
+% subjectInfo.data = cell(numel(numericalIDs),numel(subjectInfo.cols));
+% addpath(fullfile(config_folder.dataFolder, 'source-data'))
 
 % loop over participants
 for subject = numericalIDs
     
+    % load subject information to check for multiple recording files
+    eval(['Subject' num2str(subject)]);
+
     config                        = [];                                     % reset for each loop
-    config.bids_target_folder     = fullfile(studyFolder, '\1_BIDS-data'); % required 
-    config.eeg.chanloc            = fullfile([studyFolder, '\source-data\sub' num2str(subject) '\sub' num2str(subject) '_VN_E1_eloc.elc']); % optional
-    config.task                   = 'VirtualNavigation';                    % optional
+    config.bids_target_folder     = fullfile(config_folder.data_folder, config_folder.bids_folder); % required 
+    config.eeg.chanloc            = fullfile([config_folder.data_folder, '\source-data\' num2str(subject) '\' num2str(subject) '_eloc.elc']); % optional
+    config.task                   = 'MorrisWaterMaze';                      % optional
     config.subject                = subject;                                % required
     
     config.eeg.stream_name        = 'BrainVision';                          % required
@@ -183,31 +150,31 @@ for subject = numericalIDs
     config.motion.streams{1}.tracking_system    = 'Unity';
     config.motion.streams{1}.tracked_points     = {'PlayerTransform'};
     config.motion.streams{1}.positions.channel_names = {'PlayerTransform_rigid_x';'PlayerTransform_rigid_y';'PlayerTransform_rigid_z'};
-    config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_y';'PlayerTransform_quat_z'};
+    config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_z';'PlayerTransform_quat_y'};
     config.motion.POS.unit                      = 'vm';
     
-    % load subject information to check for multiple recording files  
-    eval(['sub' num2str(subject) '_info']);
-  
-    for Fi = 1:numel(subjectdata.files)
-        config.filename                 = fullfile([studyFolder, '\source-data\sub' num2str(subject) '\sub' num2str(subject) '_' subjectdata.files{Fi} '.xdf']); % required
-        if numel(subjectdata.files) > 1
-            config.run                      = Fi;
+    for session = {'VR', 'Desktop'}
+        for Fi = 1:numel(subjectdata.(['files', session{1}]))
+            config.filename                 = fullfile(config_folder.data_folder,['\source-data\' num2str(subject) '\' subjectdata.(['files', session{1}]){Fi}]); % required
+            if numel(subjectdata.(['files', session{1}])) > 1
+                config.run                      = Fi;
+            end
+            
+            bemobil_xdf2bids(config, ...
+                'general_metadata', generalInfo,...
+                'motion_metadata', motionInfo, ...
+                'eeg_metadata', eegInfo);
         end
-        bemobil_xdf2bids(config, ...
-            'general_metadata', generalInfo,...
-            'participant_metadata', subjectInfo,...
-            'motion_metadata', motionInfo, ...
-            'eeg_metadata', eegInfo);
     end
+    
     
     % configuration for bemobil bids2set
     %----------------------------------------------------------------------
     config.study_folder             = studyFolder;
-    config.session_names            = 'VirtualNavigation';
-    config.set_folder               = fullfile([config_folder.dataFolder, '\1_basic-data\sub' num2str(subject) '\sub' num2str(subject) '_' subjectdata.files{Fi} '.xdf']); % required
-    config.resample_freq            = 500; 
-    config.overwrite                = 'on'; 
+    config.session_names            = {'MoBI', 'Desktop'};
+    config.set_folder               = fullfile([config_folder.data_folder,); % required
+    config.resample_freq            = 250; 
+    
     % match labels in electrodes.tsv and channels.tsv
     matchlocs = {};
     letters = {'g', 'y', 'r', 'w'};
@@ -220,10 +187,6 @@ for subject = numericalIDs
     end
     
    config.match_electrodes_channels = matchlocs;
-   if subject == 29
-       config.match_electrodes_channels{128,1} = ''; % subject 29 missing W32 location 
-   end
-    
    bemobil_bids2set(config);
     
 end
