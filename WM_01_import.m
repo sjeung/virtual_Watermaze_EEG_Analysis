@@ -15,7 +15,12 @@ WM_config
 
 % data directory
 addpath(fullfile(config_folder.data_folder, 'source-data'))
-numericalIDs                        = [81001:81010]; % go over all participants
+numericalIDs                        = [82002,82009, 82010, 83004, 83005, 83006]; % go over all participants
+
+
+% 82009 / 82010 / 83001 missing motion stream
+% Configuration field motion specified but no streams found - check whether stream_name match the names of streams in .xdf
+% 83004 bids not found
 
 % general metadata shared across all modalities
 %--------------------------------------------------------------------------
@@ -48,7 +53,6 @@ eegInfo.coordsystem.EEGCoordinateSystem = 'Other';
 eegInfo.coordsystem.EEGCoordinateUnits = 'mm';
 eegInfo.coordsystem.EEGCoordinateSystemDescription = 'ALS with origin between ears, measured with Xensor.';
 
-
 % information about the motion recording system
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -70,14 +74,17 @@ motionInfo.motion.TrackingSystems(1).RotationRule                   = 'left-hand
 motionInfo.motion.TrackingSystems(1).RotationOrder                  = 'ZXY';
 
 % system 2 information
-motionInfo.motion.TrackingSystems(1).TrackingSystemName             = 'HTCVive';
-motionInfo.motion.TrackingSystems(1).Manufacturer                   = 'HTC';
-motionInfo.motion.TrackingSystems(1).ManufacturersModelName         = 'Vive Pro';
-motionInfo.motion.TrackingSystems(1).SamplingFrequencyNominal       = 90; %  If no nominal Fs exists, n/a entry returns 'n/a'. If it exists, n/a entry returns nominal Fs from motion stream.
-motionInfo.motion.TrackingSystems(1).SpatialAxes                    = 'RUF';
-motionInfo.motion.TrackingSystems(1).RotationRule                   = 'left-hand';
-motionInfo.motion.TrackingSystems(1).RotationOrder                  = 'ZXY';
+motionInfo.motion.TrackingSystems(2).TrackingSystemName             = 'HTCVive';
+motionInfo.motion.TrackingSystems(2).Manufacturer                   = 'HTC';
+motionInfo.motion.TrackingSystems(2).ManufacturersModelName         = 'Vive Pro';
+motionInfo.motion.TrackingSystems(2).SamplingFrequencyNominal       = 90; %  If no nominal Fs exists, n/a entry returns 'n/a'. If it exists, n/a entry returns nominal Fs from motion stream.
+motionInfo.motion.TrackingSystems(2).SpatialAxes                    = 'RUF';
+motionInfo.motion.TrackingSystems(2).RotationRule                   = 'left-hand';
+motionInfo.motion.TrackingSystems(2).RotationOrder                  = 'ZXY';
 
+% doubled because of stream name typo
+motionInfo.motion.TrackingSystems(3) = motionInfo.motion.TrackingSystems(1); 
+motionInfo.motion.TrackingSystems(4) = motionInfo.motion.TrackingSystems(2); 
 
 % participant information 
 %--------------------------------------------------------------------------
@@ -123,10 +130,10 @@ subjectInfo.fields.occupation.Levels.collegeuni     = 'college or university stu
 subjectInfo.fields.occupation.Levels.employed       = 'employed';
 subjectInfo.fields.occupation.Levels.other          = 'other';
 
-% % subject information
-% %--------------------------------------------------------------------------
-% % names of the columns - 'nr' column is just the numerical IDs of subjects
-% %                         do not change the name of this column
+% subject information
+%--------------------------------------------------------------------------
+% names of the columns - 'nr' column is just the numerical IDs of subjects
+%                         do not change the name of this column
 % subjectInfo.cols = {'nr',   'age',  'sex',  'rfpt', 'language', 'education','occupation' };
 % subjectInfo.data = cell(numel(numericalIDs),numel(subjectInfo.cols));
 % addpath(fullfile(config_folder.dataFolder, 'source-data'))
@@ -145,19 +152,52 @@ for subject = numericalIDs
     
     config.eeg.stream_name        = 'BrainVision';                          % required
     
-    config.motion.streams{1}.xdfname            = 'PlayerTransform';
-    config.motion.streams{1}.bidsname           = 'Unity';
-    config.motion.streams{1}.tracking_system    = 'Unity';
-    config.motion.streams{1}.tracked_points     = {'PlayerTransform'};
-    config.motion.streams{1}.positions.channel_names = {'PlayerTransform_rigid_x';'PlayerTransform_rigid_y';'PlayerTransform_rigid_z'};
-    config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_z';'PlayerTransform_quat_y'};
-    config.motion.POS.unit                      = 'vm';
+
     
     for session = {'VR', 'Desktop'}
+        
+        if strcmp(session{1}, 'VR')
+            config.motion.streams{1}.xdfname            = 'PlayerTransform';
+            config.motion.streams{1}.bidsname           = 'HTCVive';
+            config.motion.streams{1}.tracked_points     = {'PlayerTransform'};
+            config.motion.streams{1}.positions.channel_names = {'PlayerTransform_rigid_x';'PlayerTransform_rigid_y';'PlayerTransform_rigid_z'};
+            config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_z';'PlayerTransform_quat_y'};
+            config.motion.POS.unit                      = 'm';
+            
+            config.motion.streams{2} = config.motion.streams{1};
+            config.motion.streams{2}.xdfname            = 'PlayerTransfom';
+            config.motion.streams{2}.bidsname           = 'HTCVive2';
+            config.motion.streams{2}.tracked_points     = {'PlayerTransfom'};
+            config.motion.streams{2}.positions.channel_names = {'PlayerTransfom_rigid_x';'PlayerTransfom_rigid_y';'PlayerTransfom_rigid_z'};
+            config.motion.streams{2}.quaternions.channel_names = {'PlayerTransfom_quat_w';'PlayerTransfom_quat_x';'PlayerTransfom_quat_z';'PlayerTransfom_quat_y'};
+            
+            
+        else
+            config.motion.streams{1}.xdfname            = 'PlayerTransform';
+            config.motion.streams{1}.bidsname           = 'Unity';
+            config.motion.streams{1}.tracked_points     = {'PlayerTransform'};
+            config.motion.streams{1}.positions.channel_names = {'PlayerTransform_rigid_x';'PlayerTransform_rigid_y';'PlayerTransform_rigid_z'};
+            config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_z';'PlayerTransform_quat_y'};
+            config.motion.POS.unit                      = 'vm';           
+        
+            config.motion.streams{2} = config.motion.streams{1};
+            config.motion.streams{2}.xdfname            = 'PlayerTransfom';
+            config.motion.streams{2}.bidsname           = 'Unity2';
+            config.motion.streams{2}.tracked_points     = {'PlayerTransfom'};
+            config.motion.streams{2}.positions.channel_names = {'PlayerTransfom_rigid_x';'PlayerTransfom_rigid_y';'PlayerTransfom_rigid_z'};
+            config.motion.streams{2}.quaternions.channel_names = {'PlayerTransfom_quat_w';'PlayerTransfom_quat_x';'PlayerTransfom_quat_z';'PlayerTransfom_quat_y'};
+            
+        end
+
         for Fi = 1:numel(subjectdata.(['files', session{1}]))
             config.filename                 = fullfile(config_folder.data_folder,['\source-data\' num2str(subject) '\' subjectdata.(['files', session{1}]){Fi}]); % required
+            config.session                  = session{1}; 
             if numel(subjectdata.(['files', session{1}])) > 1
                 config.run                      = Fi;
+            else
+                if isfield(config, 'run')
+                    config = rmfield(config, 'run');
+                end
             end
             
             bemobil_xdf2bids(config, ...
@@ -167,12 +207,11 @@ for subject = numericalIDs
         end
     end
     
-    
     % configuration for bemobil bids2set
     %----------------------------------------------------------------------
-    config.study_folder             = studyFolder;
-    config.session_names            = {'MoBI', 'Desktop'};
-    config.set_folder               = fullfile([config_folder.data_folder,); % required
+    config.study_folder             = config_folder.data_folder;
+    config.session_names            = {'VR', 'Desktop'};
+    config.set_folder               = fullfile(config_folder.data_folder, config_folder.set_folder); % required
     config.resample_freq            = 250; 
     
     % match labels in electrodes.tsv and channels.tsv
@@ -187,6 +226,7 @@ for subject = numericalIDs
     end
     
    config.match_electrodes_channels = matchlocs;
+   config.other_data_types        = {'motion'};
    bemobil_bids2set(config);
     
 end
