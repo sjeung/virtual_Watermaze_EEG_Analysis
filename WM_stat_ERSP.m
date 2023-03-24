@@ -33,7 +33,7 @@ end
 mobiPMat    = cat(3,mobiP{:});
 deskPMat    = cat(3,deskP{:});
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(mobiPMat,deskPMat, 'true', pThreshold, nPermutations, 'true');
-util_WM_plot_ERSP(diffPatients, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' channelGroup.key '.png'], clusters)
+util_WM_plot_ERSP(diffPatients, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '.png'], clusters)
 
 pMTL = p_values(p_values < 0.05);
 statStruct.mtl.clusters = clusters; 
@@ -60,20 +60,20 @@ end
 mobiCMat    = cat(3,mobiC{:});
 deskCMat    = cat(3,deskC{:});
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(mobiCMat,deskCMat, 'true', pThreshold, nPermutations, 'true');
-util_WM_plot_ERSP(diffControls, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' channelGroup.key '.png'], clusters)
+util_WM_plot_ERSP(diffControls, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' trialType '_' channelGroup.key '.png'], clusters)
 pCTRL = p_values(p_values < 0.05);
 statStruct.ctrl.clusters = clusters; 
 statStruct.ctrl.p_values = p_values; 
 statStruct.ctrl.t_sums = t_sums; 
 statStruct.ctrl.permutation_distribution = permutation_distribution;
 
-for Pi = 1:numel(missedPatients)
-   %warning(['Data from ' num2str(missedPatients(Pi)) ' could not be processed'])
-end
-
-for Ci = 1:numel(missedControls)
-   %warning(['Data from ' num2str(missedControls(Ci)) ' could not be processed'])
-end
+% for Pi = 1:numel(missedPatients)
+%    %warning(['Data from ' num2str(missedPatients(Pi)) ' could not be processed'])
+% end
+% 
+% for Ci = 1:numel(missedControls)
+%    %warning(['Data from ' num2str(missedControls(Ci)) ' could not be processed'])
+% end
 
 
 end

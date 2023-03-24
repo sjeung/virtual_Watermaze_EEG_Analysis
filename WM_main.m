@@ -41,19 +41,30 @@ for Pi = allParticipants
     WM_08_bandpower(Pi); 
 end
 
-statArray = {}; 
-for Gi = 1:numel(config_param.chanGroups)
-    disp(config_param.chanGroups(Gi).key)
-    [pMTL, pCTRL, statStruct] = WM_stat_ERSP('probe', 'start', config_param.chanGroups(Gi));
-    
-    statArray{end+1} = statStruct; 
-    
-    for pInd = 1:numel(pMTL)
-        disp(['MTL cluster p = ' num2str(pMTL(pInd)) ' for ' config_param.chanGroups(Gi).key])
-    end
+% Run statistics on ERSP results
+%--------------------------------------------------------------------------
+trialTypes = {'learn', 'probe'}; 
 
-    for pInd = 1:numel(pCTRL)
-        disp(['CTRL cluster p = ' num2str(pCTRL(pInd)) ' for ' config_param.chanGroups(Gi).key])
+for Ti = 1:2
+    
+    trialType = trialTypes{Ti}; 
+    statArray = {};
+    for Gi = 1:numel(config_param.chanGroups)
+        
+        disp(config_param.chanGroups(Gi).key)
+        [pMTL, pCTRL, statStruct] = WM_stat_ERSP(trialType, 'start', config_param.chanGroups(Gi));
+        
+        statArray{end+1} = statStruct;
+        
+        for pInd = 1:numel(pMTL)
+            disp(['MTL cluster p = ' num2str(pMTL(pInd)) ' for ' config_param.chanGroups(Gi).key])
+        end
+        
+        for pInd = 1:numel(pCTRL)
+            disp(['CTRL cluster p = ' num2str(pCTRL(pInd)) ' for ' config_param.chanGroups(Gi).key])
+        end
+        
     end
-
+    
+    save(fullfile(config_folder.results_folder, config_folder.ersp_folder, ['stats_' trialType '.mat']), 'statArray');
 end
