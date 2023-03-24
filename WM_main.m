@@ -38,6 +38,7 @@ for Pi = allParticipants
     catch
         errorParticipants(end+1) = Pi;
     end
+    WM_08_bandpower(Pi); 
 end
 
 statArray = {}; 
