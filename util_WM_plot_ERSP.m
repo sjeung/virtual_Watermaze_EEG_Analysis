@@ -36,7 +36,10 @@ close(f);
 
 if ~isempty(mask)
     MaskedMean = ERSPMean;
-    MaskedMean(mask{1}) = NaN;
+    allInds = 1:numel(MaskedMean);
+    restInds = setdiff(allInds, mask{1});
+    MaskedMean(restInds)    = 10;
+    MaskedMean(mask{1})     = 2.5;
     f = figure;
     imagesclogy(times,...
         freqs,...
@@ -47,9 +50,8 @@ if ~isempty(mask)
     title(figTitle,'Interpreter', 'none')
     xline(0,'black');
     xticks([500, 1500, 2500])
-    colorbar;
     caxis([0, 4.5]);
-    
+    colormap(gca, pink);
     saveas(f, [figFullpath(1:end-4) '_mask.png'])
     close(f);
 end
