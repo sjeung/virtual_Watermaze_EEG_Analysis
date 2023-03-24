@@ -29,7 +29,7 @@ config_folder.epoched_folder           = '7_epoched';                          %
 % results folder and file names 
 %--------------------------------------------------------------------------
 config_folder.ersp_folder           = 'ERSP'; 
-
+config_folder.band_folder           = 'bandpower'; 
 
 
 
