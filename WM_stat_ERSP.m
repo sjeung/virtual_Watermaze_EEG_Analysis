@@ -35,7 +35,7 @@ deskPMat    = cat(3,deskP{:});
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(mobiPMat,deskPMat, 'true', pThreshold, nPermutations, 'true');
 util_WM_plot_ERSP(diffPatients, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '.png'], clusters)
 
-pMTL = p_values(p_values < 0.05);
+pMTL = p_values(p_values < pThreshold);
 statStruct.mtl.clusters = clusters; 
 statStruct.mtl.p_values = p_values; 
 statStruct.mtl.t_sums = t_sums; 
@@ -61,7 +61,7 @@ mobiCMat    = cat(3,mobiC{:});
 deskCMat    = cat(3,deskC{:});
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(mobiCMat,deskCMat, 'true', pThreshold, nPermutations, 'true');
 util_WM_plot_ERSP(diffControls, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' trialType '_' channelGroup.key '.png'], clusters)
-pCTRL = p_values(p_values < 0.05);
+pCTRL = p_values(p_values < pThreshold);
 statStruct.ctrl.clusters = clusters; 
 statStruct.ctrl.p_values = p_values; 
 statStruct.ctrl.t_sums = t_sums; 

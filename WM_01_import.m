@@ -15,10 +15,18 @@ WM_config
 
 % data directory
 addpath(fullfile(config_folder.data_folder, 'source-data'))
-numericalIDs                        = [82002,82009, 82010, 83004, 83005, 83006]; % go over all participants
+numericalIDs                        = [84009]; % go over all participants
 
 
-% 82009 / 82010 / 83001 missing motion stream
+% import issues
+% 82002 : run index issue
+% 82009 : excluded due to nausea, missing motion stream in VR
+% 82010 : desktop session issue (no motion stream found?)
+% 83004 : broken recording 
+% 83006 : eloc file name issue suspected - solved
+% 84009 : eloc file name issue, forgot to import - solved
+
+
 % Configuration field motion specified but no streams found - check whether stream_name match the names of streams in .xdf
 % 83004 bids not found
 

@@ -23,7 +23,7 @@ xticks([500, 1500, 2500])
 colorbar; 
 
 if ~isempty(mask)
- caxis([0, 4.5]); 
+ caxis([-4, 4]); 
 end
 
 if ~isfolder(fileparts(figFullpath))

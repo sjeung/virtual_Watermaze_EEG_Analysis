@@ -1,6 +1,7 @@
-function [bandpowerAll] = util_WM_band(EEG, epochInds)
+function [bandpowerAll] = util_WM_band(EEG, epochInds, baseERSP)
 
-bandpowerAll = NaN(1,numel(EEG.chanlocs)); 
+bandpowerAll    = NaN(1,numel(EEG.chanlocs)); 
+tBandWindow     = [-500, 2000]; 
 
 fft_options = struct();
 fft_options.cycles = [3 0.25];
@@ -21,13 +22,15 @@ for Ei = 1:numel(EEG.chanlocs)
         'padratio',fft_options.padratio,...
         'alpha',fft_options.alpha,...   
         'powbase',fft_options.powbase,...
-        'baseline',NaN,... % no baseline, since that is only a subtraction of the freq values, we do it manually
+        'baseline',NaN,... % manually subtract baseline task activity
         'plotersp','off',...
         'plotitc','off',...
         'verbose','off');
-    
-    bandpower = mean(mean(ERSP)); 
-    bandpowerAll(Ei) = bandpower; 
+    [~,tStartInd]   = min(abs(times-tBandWindow(1)));
+    [~,tEndInd]     = min(abs(times-tBandWindow(2)));
+    bandpower = mean(mean(ERSP(:,tStartInd:tEndInd)));
+    basepower = mean(mean(baseERSP{Ei}(:,tStartInd:tEndInd))); 
+    bandpowerAll(Ei) = bandpower - basepower; 
 end
 
 end

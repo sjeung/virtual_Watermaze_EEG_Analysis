@@ -28,10 +28,14 @@ elecInds = elecGroup.chan_inds;
 
 EEG = pop_loadset('filepath', epochedFileDir, 'filename', epochedFileName); 
 
+%% compute baseline
+[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,elecInds); 
+
 %% learn trials start
 eventInds       = find(strcmp('searchtrial:start', {EEG.event.type}) & [EEG.event.session] == 1); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
 [ERSP_learn_start_mobi, times, freqs] = util_WM_ERSP(EEG, elecInds, epochInds);
+[ERSP_learn_start_mobi] = util_WM_basecorrect(ERSP_learn_start_mobi, ERSPAllMOBI);
 figTitle        = [num2str(Pi) ', Learn Start, MoBI']; 
 figFilename     = [num2str(Pi) '_ERSP_L_S_M_' elecGroup.key '.png'];
 util_WM_plot_ERSP(ERSP_learn_start_mobi, times, freqs, figTitle, fullfile(erspFileDir, figFilename), [])
@@ -39,6 +43,7 @@ util_WM_plot_ERSP(ERSP_learn_start_mobi, times, freqs, figTitle, fullfile(erspFi
 eventInds       = find(strcmp('searchtrial:start', {EEG.event.type}) & [EEG.event.session] == 2); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
 [ERSP_learn_start_desktop] = util_WM_ERSP(EEG, elecInds, epochInds); 
+[ERSP_learn_start_desktop] = util_WM_basecorrect(ERSP_learn_start_desktop, ERSPAllSTAT);
 figTitle        = [num2str(Pi) ', Learn Start, Desktop']; 
 figFilename     = [num2str(Pi) '_ERSP_L_S_D_' elecGroup.key '.png'];
 util_WM_plot_ERSP(ERSP_learn_start_desktop, times, freqs, figTitle, fullfile(erspFileDir, figFilename), [])
@@ -49,13 +54,15 @@ util_WM_plot_ERSP(ERSP_learn_start_desktop, times, freqs, figTitle, fullfile(ers
 eventInds       = find(contains({EEG.event.type},'guesstrial:start') & [EEG.event.session] == 1); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
 [ERSP_probe_start_mobi] = util_WM_ERSP(EEG, elecInds, epochInds); 
+[ERSP_probe_start_mobi] = util_WM_basecorrect(ERSP_probe_start_mobi, ERSPAllMOBI);
 figTitle        = [num2str(Pi) ', Probe Start, MoBI']; 
 figFilename     = [num2str(Pi) '_ERSP_P_S_M_' elecGroup.key '.png'];
 util_WM_plot_ERSP(ERSP_probe_start_mobi, times, freqs, figTitle, fullfile(erspFileDir, figFilename), [])
 
 eventInds       = find(contains({EEG.event.type},'guesstrial:start') & [EEG.event.session] == 2); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
-[ERSP_probe_start_desktop] = util_WM_ERSP(EEG, elecInds, epochInds); 
+[ERSP_probe_start_desktop] = util_WM_ERSP(EEG, elecInds, epochInds);
+[ERSP_probe_start_desktop] = util_WM_basecorrect(ERSP_probe_start_desktop, ERSPAllSTAT);
 figTitle        = [num2str(Pi) ', Probe Start, Desktop']; 
 figFilename     = [num2str(Pi) '_ERSP_P_S_D_' elecGroup.key '.png'];
 util_WM_plot_ERSP(ERSP_probe_start_desktop, times, freqs, figTitle, fullfile(erspFileDir, figFilename), [])

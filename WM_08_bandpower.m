@@ -25,17 +25,21 @@ WM_config;
 
 EEG = pop_loadset('filepath', epochedFileDir, 'filename', epochedFileName); 
 
+
+%% baseline computation
+[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,1:numel(EEG.chanlocs)); 
+
 %% learn trials start
 eventInds       = find(strcmp('searchtrial:start', {EEG.event.type}) & [EEG.event.session] == 1); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
-band_learn_start_mobi = util_WM_band(EEG, epochInds);
+band_learn_start_mobi = util_WM_band(EEG, epochInds, ERSPAllMOBI);
 figTitle        = [num2str(Pi) ', Learn Start, MoBI, theta']; 
 figFilename     = [num2str(Pi) '_band_L_S_M.png'];
 util_WM_plot_topo(band_learn_start_mobi, EEG.chanlocs, figTitle, fullfile(bandFileDir, figFilename))
 
 eventInds       = find(strcmp('searchtrial:start', {EEG.event.type}) & [EEG.event.session] == 2); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
-band_learn_start_desktop = util_WM_band(EEG, epochInds); 
+band_learn_start_desktop = util_WM_band(EEG, epochInds, ERSPAllSTAT); 
 figTitle        = [num2str(Pi) ', Learn Start, Desktop, theta']; 
 figFilename     = [num2str(Pi) '_band_L_S_D.png'];
 util_WM_plot_topo(band_learn_start_desktop, EEG.chanlocs, figTitle, fullfile(bandFileDir, figFilename))
@@ -45,14 +49,14 @@ util_WM_plot_topo(band_learn_start_desktop, EEG.chanlocs, figTitle, fullfile(ban
 %% probe trials start
 eventInds       = find(contains({EEG.event.type},'guesstrial:start') & [EEG.event.session] == 1); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
-[band_probe_start_mobi] = util_WM_band(EEG, epochInds); 
+[band_probe_start_mobi] = util_WM_band(EEG, epochInds, ERSPAllMOBI); 
 figTitle        = [num2str(Pi) ', Probe Start, MoBI, theta']; 
 figFilename     = [num2str(Pi) '_band_P_S_M.png'];
 util_WM_plot_topo(band_probe_start_mobi, EEG.chanlocs, figTitle, fullfile(bandFileDir, figFilename))
 
 eventInds       = find(contains({EEG.event.type},'guesstrial:start') & [EEG.event.session] == 2); 
 epochInds       = util_WM_event2epoch(EEG, eventInds);
-[band_probe_start_desktop] = util_WM_band(EEG, epochInds); 
+[band_probe_start_desktop] = util_WM_band(EEG, epochInds, ERSPAllSTAT); 
 figTitle        = [num2str(Pi) ', Probe Start, Desktop, theta']; 
 figFilename     = [num2str(Pi) '_band_P_S_D.png'];
 util_WM_plot_topo(band_probe_start_desktop, EEG.chanlocs, figTitle, fullfile(bandFileDir, figFilename))

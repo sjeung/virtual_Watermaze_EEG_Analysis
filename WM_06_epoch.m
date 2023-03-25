@@ -184,7 +184,7 @@ end
 assert(numel(guess_ends) == numel(guess_epochs)); 
 
 % segments data into epochs (searchtrial:found, guesstrial:start)
-epochedEEG      = pop_epoch(EEG, ['searchtrial:start', search_ends, guess_epochs, guess_ends], [-1 4], 'epochinfo', 'yes');
+epochedEEG      = pop_epoch(EEG, ['searchtrial:start', search_ends, guess_epochs], [-1 4], 'epochinfo', 'yes');
 
 if ~isfolder(epochedFileDir)
     mkdir(epochedFileDir)
