@@ -32,8 +32,6 @@ config_folder.ersp_folder           = 'ERSP';
 config_folder.band_folder           = 'bandpower'; 
 
 
-
-
 % file name parts to be used for single participants 
 %--------------------------------------------------------------------------
 % construction : 

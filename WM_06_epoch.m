@@ -10,7 +10,7 @@ WM_config;
 % !! update with the commented out line after doing custom IC cleaning
 % [cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, config_folder.cleaned_folder, config_folder.cleanedFileName, Pi);
 [cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, '5_post-AMICA', '_cleaned_with_ICA.set', Pi);
-[epochedFileName,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, config_folder.epochedFileName, Pi);
+[epochedFileName,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, '_epoched', Pi);
 
 EEG = pop_loadset('filepath', cleanedFileDir, 'filename', cleanedFileName);
 
@@ -157,39 +157,47 @@ end
 % Third: extract epochs from trials
 %-----------------------------------------------------------------------------
 % guess_epochs include all the events that start with guesstrial:start
-guess_epochs    = [];
-guess_ends      = [];
-search_ends     = [];
-guess.count     = 1;
-search.count    = 1;
+learn_starts    = []; 
+learn_ends     = [];
+probe_starts    = [];
+probe_ends      = [];
+learn.count     = 1;
+probe.count    = 1;
 
 for event_idx = 1:length(EEG.event)
     
+    if startsWith(EEG.event(event_idx).type, 'searchtrial:start')
+        learn_starts{learn.count} = EEG.event(event_idx).type;
+    end
+    
     if startsWith(EEG.event(event_idx).type, 'searchtrial:found') 
-        search_ends{search.count} = EEG.event(event_idx).type;
-        search.count = search.count + 1;
+        learn_ends{learn.count} = EEG.event(event_idx).type;
+        learn.count = learn.count + 1;
     end
     
     if startsWith(EEG.event(event_idx).type, 'guesstrial:start')
-        guess_epochs{guess.count} = EEG.event(event_idx).type;
+        probe_starts{probe.count} = EEG.event(event_idx).type;
     end
     
     if startsWith(EEG.event(event_idx).type, 'guesstrial:keypress')
-        guess_ends{guess.count} = EEG.event(event_idx).type;
-        guess.count = guess.count + 1;
+        probe_ends{probe.count} = EEG.event(event_idx).type;
+        probe.count = probe.count + 1;
     end
     
 end
 
-assert(numel(guess_ends) == numel(guess_epochs)); 
+assert(numel(learn_ends) == numel(learn_starts)); 
+assert(numel(probe_ends) == numel(probe_starts)); 
 
 % segments data into epochs (searchtrial:found, guesstrial:start)
-epochedEEG      = pop_epoch(EEG, ['searchtrial:start', search_ends, guess_epochs], [-1 4], 'epochinfo', 'yes');
+epochedEEGStart     = pop_epoch(EEG, [learn_starts, probe_starts], [-1 4], 'epochinfo', 'yes');
+epochedEEGEnd       = pop_epoch(EEG, [learn_ends, probe_ends], [-4 1], 'epochinfo', 'yes');
 
 if ~isfolder(epochedFileDir)
     mkdir(epochedFileDir)
 end
 
-pop_saveset(epochedEEG, 'filepath', epochedFileDir, 'filename', epochedFileName)
+pop_saveset(epochedEEGStart, 'filepath', epochedFileDir, 'filename', [epochedFileName '_start.set']);
+pop_saveset(epochedEEGEnd, 'filepath', epochedFileDir, 'filename', [epochedFileName '_end.set']);
 
 end

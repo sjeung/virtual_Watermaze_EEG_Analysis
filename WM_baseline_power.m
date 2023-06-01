@@ -1,6 +1,6 @@
 function [ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi, elecInds)
-baseMOBIEpoch =pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_mobi_stand.set']); 
-baseSTATEpoch =pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_stat_stand.set']);
+baseMOBIEpoch =pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_mobi_walk.set']); 
+baseSTATEpoch =pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_stat_walk.set']);
 
 fft_options = struct();
 fft_options.cycles = [3 0.25];

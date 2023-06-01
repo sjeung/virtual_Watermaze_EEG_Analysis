@@ -1,4 +1,4 @@
-function [pMTL, pCTRL, statStruct] = WM_stat_ERSP(trialType, trialSection, channelGroup)
+function [pMTL, pCTRL, statStruct, missingParticipants] = WM_stat_ERSP(trialType, trialSection, channelGroup)
 
 % trialType = 'learn' or 'probe'
 %--------------------------------------------------------------------------
@@ -33,7 +33,9 @@ end
 mobiPMat    = cat(3,mobiP{:});
 deskPMat    = cat(3,deskP{:});
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(mobiPMat,deskPMat, 'true', pThreshold, nPermutations, 'true');
-util_WM_plot_ERSP(diffPatients, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '.png'], clusters)
+util_WM_plot_ERSP(diffPatients, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_diff.png'], clusters)
+util_WM_plot_ERSP(mobiP, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key '_MOBI'], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_mobi.png'],[])
+util_WM_plot_ERSP(deskP, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key '_STAT'], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_stat.png'],[])
 
 pMTL = p_values(p_values < pThreshold);
 statStruct.mtl.clusters = clusters; 
@@ -60,7 +62,10 @@ end
 mobiCMat    = cat(3,mobiC{:});
 deskCMat    = cat(3,deskC{:});
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(mobiCMat,deskCMat, 'true', pThreshold, nPermutations, 'true');
-util_WM_plot_ERSP(diffControls, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' trialType '_' channelGroup.key '.png'], clusters)
+util_WM_plot_ERSP(diffControls, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' trialType '_' channelGroup.key '_diff.png'], clusters)
+util_WM_plot_ERSP(mobiC, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key '_MOBI'], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' trialType '_' channelGroup.key '_mobi.png'], [])
+util_WM_plot_ERSP(deskC, timePoints, freqPoints, ['ERSP_Controls_' channelGroup.key '_STAT'], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_control_' trialType '_' channelGroup.key '_stat.png'], [])
+
 pCTRL = p_values(p_values < pThreshold);
 statStruct.ctrl.clusters = clusters; 
 statStruct.ctrl.p_values = p_values; 
@@ -75,5 +80,6 @@ statStruct.ctrl.permutation_distribution = permutation_distribution;
 %    %warning(['Data from ' num2str(missedControls(Ci)) ' could not be processed'])
 % end
 
+missingParticipants = [missedPatients, missedControls];
 
 end

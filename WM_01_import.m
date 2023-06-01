@@ -11,11 +11,17 @@ eeglab; % start eeglab to add bemobil pipeline to matlab path
 rmpath(fileparts(which('ft_defaults'))) % remove the fieldtrip version that is in the pipeline
 addpath('C:\Users\seinjeung\Documents\GitHub\fieldtrip') % add the modded fieldtrip
 
+% check streams 
+addpath('C:\Users\seinjeung\Documents\GitHub\fieldtrip\external\xdf')
+streams = load_xdf('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\source-data\81001\81001_VR.xdf'); 
+cellfun(@(x) x.info.name,streams,'UniformOutput', false)
+%cellfun(@(x) x.label, motionStream.info.desc.channels.channel, 'UniformOutput', false)'
+
 WM_config
 
 % data directory
 addpath(fullfile(config_folder.data_folder, 'source-data'))
-numericalIDs                        = [84009]; % go over all participants
+numericalIDs                        = [81001]; % go over all participants
 
 
 % import issues
@@ -26,9 +32,6 @@ numericalIDs                        = [84009]; % go over all participants
 % 83006 : eloc file name issue suspected - solved
 % 84009 : eloc file name issue, forgot to import - solved
 
-
-% Configuration field motion specified but no streams found - check whether stream_name match the names of streams in .xdf
-% 83004 bids not found
 
 % general metadata shared across all modalities
 %--------------------------------------------------------------------------
@@ -42,7 +45,7 @@ generalInfo.dataset_description.BIDSVersion         = 'unofficial extension';
 % optional for dataset_description.json
 generalInfo.dataset_description.License             = 'n/a';
 generalInfo.dataset_description.Authors             = {"Jeung, S.", "Iggena, D.", "Maier, P.", "Ploner, C.", "Finke, C.", "Gramann, K."};
-generalInfo.dataset_description.Acknowledgements    = 'n/a';
+generalInfo.dataset_description.Acknowledgements    = 'We acknowledge support from Timo Berg for data collection';
 generalInfo.dataset_description.Funding             = {"n/a"};
 generalInfo.dataset_description.ReferencesAndLinks  = {"n/a"};
 generalInfo.dataset_description.DatasetDOI          = 'n/a';
@@ -56,9 +59,9 @@ generalInfo.TaskDescription                         = 'MTL patients and double-m
 % information about the eeg recording system
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
-eegInfo     = [];
-eegInfo.coordsystem.EEGCoordinateSystem = 'Other';
-eegInfo.coordsystem.EEGCoordinateUnits = 'mm';
+eegInfo                                     = [];
+eegInfo.coordsystem.EEGCoordinateSystem     = 'Other';
+eegInfo.coordsystem.EEGCoordinateUnits      = 'mm';
 eegInfo.coordsystem.EEGCoordinateSystemDescription = 'ALS with origin between ears, measured with Xensor.';
 
 % information about the motion recording system
@@ -66,11 +69,11 @@ eegInfo.coordsystem.EEGCoordinateSystemDescription = 'ALS with origin between ea
 %--------------------------------------------------------------------------
 motionInfo  = [];
 
-tracking_systems                                    = {'Unity'};
+tracking_systems                                                    = {'Unity'};
 
 % motion specific fields in json
 motionInfo.motion = [];
-motionInfo.motion.RecordingType                     = 'continuous';
+motionInfo.motion.RecordingType                                     = 'continuous';
 
 % system 1 information
 motionInfo.motion.TrackingSystems(1).TrackingSystemName             = 'Unity';
@@ -91,8 +94,20 @@ motionInfo.motion.TrackingSystems(2).RotationRule                   = 'left-hand
 motionInfo.motion.TrackingSystems(2).RotationOrder                  = 'ZXY';
 
 % doubled because of stream name typo
-motionInfo.motion.TrackingSystems(3) = motionInfo.motion.TrackingSystems(1); 
-motionInfo.motion.TrackingSystems(4) = motionInfo.motion.TrackingSystems(2); 
+motionInfo.motion.TrackingSystems(3)                                = motionInfo.motion.TrackingSystems(1); 
+motionInfo.motion.TrackingSystems(2).TrackingSystemName             = 'Unity2';
+motionInfo.motion.TrackingSystems(4)                                = motionInfo.motion.TrackingSystems(2); 
+motionInfo.motion.TrackingSystems(2).TrackingSystemName             = 'HTCVive2';
+
+% system 3 information : HTC Vive trackers 
+motionInfo.motion.TrackingSystems(5)                                = motionInfo.motion.TrackingSystems(2); 
+motionInfo.motion.TrackingSystems(6)                                = motionInfo.motion.TrackingSystems(2); 
+motionInfo.motion.TrackingSystems(7)                                = motionInfo.motion.TrackingSystems(2); 
+motionInfo.motion.TrackingSystems(5).TrackingSystemName             = 'Torso';
+motionInfo.motion.TrackingSystems(6).TrackingSystemName             = 'LeftFoot';
+motionInfo.motion.TrackingSystems(7).TrackingSystemName             = 'RightFoot';
+
+
 
 % participant information 
 %--------------------------------------------------------------------------
@@ -108,7 +123,7 @@ motionInfo.motion.TrackingSystems(4) = motionInfo.motion.TrackingSystems(2);
 %--------------------------------------------------------------------------
 subjectInfo = [];
 
-subjectInfo.fields.nr.Description      = 'age of the participant'; 
+subjectInfo.fields.nr.Description       = 'participant ID'; 
 
 subjectInfo.fields.age.Description      = 'age of the participant'; 
 subjectInfo.fields.age.Unit             = 'years'; 
@@ -160,17 +175,17 @@ for subject = numericalIDs
     
     config.eeg.stream_name        = 'BrainVision';                          % required
     
-
     
-    for session = {'VR', 'Desktop'}
+    for session = {'VR'} % , 'Desktop'}
         
         if strcmp(session{1}, 'VR')
+            config.motion.POS.unit                      = 'm';
+             
             config.motion.streams{1}.xdfname            = 'PlayerTransform';
             config.motion.streams{1}.bidsname           = 'HTCVive';
             config.motion.streams{1}.tracked_points     = {'PlayerTransform'};
             config.motion.streams{1}.positions.channel_names = {'PlayerTransform_rigid_x';'PlayerTransform_rigid_y';'PlayerTransform_rigid_z'};
             config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_z';'PlayerTransform_quat_y'};
-            config.motion.POS.unit                      = 'm';
             
             config.motion.streams{2} = config.motion.streams{1};
             config.motion.streams{2}.xdfname            = 'PlayerTransfom';
@@ -179,15 +194,36 @@ for subject = numericalIDs
             config.motion.streams{2}.positions.channel_names = {'PlayerTransfom_rigid_x';'PlayerTransfom_rigid_y';'PlayerTransfom_rigid_z'};
             config.motion.streams{2}.quaternions.channel_names = {'PlayerTransfom_quat_w';'PlayerTransfom_quat_x';'PlayerTransfom_quat_z';'PlayerTransfom_quat_y'};
             
+            config.motion.streams{3} = config.motion.streams{1};
+            config.motion.streams{3}.xdfname            = 'Torso';
+            config.motion.streams{3}.bidsname           = 'Torso';
+            config.motion.streams{3}.tracked_points     = {'Torso'};
+            config.motion.streams{3}.positions.channel_names = {'Torso_rigid_x';'Torso_rigid_y';'Torso_rigid_z'};
+            config.motion.streams{3}.quaternions.channel_names = {'Torso_quat_w';'Torso_quat_x';'Torso_quat_z';'Torso_quat_y'};
             
+            config.motion.streams{4} = config.motion.streams{1};
+            config.motion.streams{4}.xdfname            = 'LeftFoot';
+            config.motion.streams{4}.bidsname           = 'LeftFoot';
+            config.motion.streams{4}.tracked_points     = {'LeftFoot'};
+            config.motion.streams{4}.positions.channel_names = {'LeftFoot_rigid_x';'LeftFoot_rigid_y';'LeftFoot_rigid_z'};
+            config.motion.streams{4}.quaternions.channel_names = {'LeftFoot_quat_w';'LeftFoot_quat_x';'LeftFoot_quat_z';'LeftFoot_quat_y'};
+            
+            config.motion.streams{5} = config.motion.streams{1};
+            config.motion.streams{5}.xdfname            = 'RightFoot';
+            config.motion.streams{5}.bidsname           = 'RightFoot';
+            config.motion.streams{5}.tracked_points     = {'RightFoot'};
+            config.motion.streams{5}.positions.channel_names = {'RightFoot_rigid_x';'RightFoot_rigid_y';'RightFoot_rigid_z'};
+            config.motion.streams{5}.quaternions.channel_names = {'RightFoot_quat_w';'RightFoot_quat_x';'RightFoot_quat_z';'RightFoot_quat_y'};
+       
         else
+            config.motion.POS.unit                      = 'vm';           
+        
             config.motion.streams{1}.xdfname            = 'PlayerTransform';
             config.motion.streams{1}.bidsname           = 'Unity';
             config.motion.streams{1}.tracked_points     = {'PlayerTransform'};
             config.motion.streams{1}.positions.channel_names = {'PlayerTransform_rigid_x';'PlayerTransform_rigid_y';'PlayerTransform_rigid_z'};
             config.motion.streams{1}.quaternions.channel_names = {'PlayerTransform_quat_w';'PlayerTransform_quat_x';'PlayerTransform_quat_z';'PlayerTransform_quat_y'};
-            config.motion.POS.unit                      = 'vm';           
-        
+            
             config.motion.streams{2} = config.motion.streams{1};
             config.motion.streams{2}.xdfname            = 'PlayerTransfom';
             config.motion.streams{2}.bidsname           = 'Unity2';
@@ -233,8 +269,8 @@ for subject = numericalIDs
         end
     end
     
-   config.match_electrodes_channels = matchlocs;
-   config.other_data_types        = {'motion'};
+   config.match_electrodes_channels     = matchlocs;
+   config.other_data_types              = {'motion'};
    bemobil_bids2set(config);
     
 end

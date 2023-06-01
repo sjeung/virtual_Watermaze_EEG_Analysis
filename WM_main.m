@@ -57,7 +57,7 @@ for Ti = 1:2
     for Gi = 1:numel(config_param.chanGroups)
         
         disp([config_param.chanGroups(Gi).key, ', ' trialType])
-        [pMTL, pCTRL, statStruct] = WM_stat_ERSP(trialType, 'start', config_param.chanGroups(Gi));
+        [pMTL, pCTRL, statStruct, missingParticipants] = WM_stat_ERSP(trialType, 'start', config_param.chanGroups(Gi));
         
         statArray{end+1} = statStruct;
         
