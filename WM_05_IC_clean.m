@@ -8,8 +8,8 @@ function WM_05_IC_clean(Pi)
 % load configs
 WM_config;
 
-[icaFileName,icaFileDir]            = assemble_file(config_folder.data_folder, config_folder.postAMICA_folder, config_folder.postAMICA_filename, Pi); 
-[cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, config_folder.cleaned_folder, config_folder.cleaned_filename, Pi);
+[icaFileName,icaFileDir]            = assemble_file(config_folder.data_folder, config_folder.postAMICA_folder, config_folder.postAMICAFileName, Pi); 
+[cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, config_folder.cleaned_folder, config_folder.cleanedFileName, Pi);
 
 % load EEG after AMICA
 EEG = pop_loadset('filepath', icaFileDir, 'filename', icaFileName); 
@@ -39,16 +39,13 @@ end
 pop_saveset(cleanedEEG,'filepath',cleanedFileDir,'filename',cleanedFileName); 
 
 % generate plots
-% 1. channel level data
-plot_channel_data(cleanedEEG, fullfile(cleanedFileDir, cleanedFileName(1:end-4)))
-
-% 2. removed ICs 
+% removed ICs 
 f = bemobil_plot_patterns(EEG.icawinv(:,allInds), EEG.chanlocs);
 savefig(f,fullfile(cleanedFileDir, [cleanedFileName(1:end-4) '_removed_IC.fig']))
 print(f,fullfile(cleanedFileDir, [cleanedFileName(1:end-4) '_removed_IC.png']),'-dpng')
 close(f)
 
-% 3. saved ICs
+% saved ICs
 f = bemobil_plot_patterns(cleanedEEG.icawinv, EEG.chanlocs);
 savefig(f,fullfile(cleanedFileDir, [cleanedFileName(1:end-4) '_kept_IC.fig']))
 print(f,fullfile(cleanedFileDir, [cleanedFileName(1:end-4) '_kept_IC.png']),'-dpng')

@@ -22,7 +22,7 @@ config_folder.postAMICA_folder         = '5_post-AMICA';
     config_folder.postAMICAFileName           = '_preprocessed_and_ICA.set';                       
 config_folder.cleaned_folder           = '6_cleaned'; 
     config_folder.cleanedFileName             = '_cleaned.set';       
-config_folder.epoched_folder           = '7_epoched';                          % from here on .set is not used anymore and mainly fieldtrip is used                 
+config_folder.epoched_folder           = '7_epoched';                       % from here on .set is not used anymore and mainly fieldtrip is used                 
     config_folder.epochedFileName         = '_epoched.set';
 
     
@@ -32,18 +32,11 @@ config_folder.ersp_folder           = 'ERSP';
 config_folder.band_folder           = 'bandpower'; 
 
 
-% file name parts to be used for single participants 
-%--------------------------------------------------------------------------
-% construction : 
-% VN_E1_Data\1_BIDS-Data\sub-0X\sub-0X_filename.ext
-
-% file names for aggregated files 
-%--------------------------------------------------------------------------
-
-
-%% Participant information 
-
 %% Parameters 
+% IC cleaning 
+%--------------------------------------------------------------------------
+config_param.IC_threshold    = 0.9; 
+
 % Beamforming 
 %--------------------------------------------------------------------------
 config_param.ROI_names       = {'Hippocampus_L', 'Hippocampus_R', 'Parahippocampus_L', 'Parahippocampus_R'};
