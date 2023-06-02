@@ -28,10 +28,13 @@ elecInds = elecGroup.chan_inds;
 [cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, '5_post-AMICA', '_cleaned_with_ICA.set', Pi);
 [erspFileName,erspFileDir]          = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_ERSP_' elecGroup.key '.mat'], Pi);
 
-EEG = pop_loadset('filepath', cleanedFileDir, 'filename', cleanedFileName); 
+[epochedFileName,epochedFileDir]            = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
+[erspFileName,erspFileDir]                  = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_ERSP_' elecGroup.key '.mat'], Pi);
+
+load(fullfile(epochedFileDir, epochedFileName), 'ftEEG'); 
 
 %% 1. Compute baseline
-[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,elecInds); 
+[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,elecGroup.chan_names); 
 
 %% 2. Time-frequency analysis of entire trials for timewarping later 
 [ERSPLearnS] = util_WM_ERSP(EEG, elecInds, 'learn', 'stat');

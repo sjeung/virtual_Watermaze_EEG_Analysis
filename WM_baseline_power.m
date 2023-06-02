@@ -1,56 +1,39 @@
-function [ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi, elecInds)
-baseMOBIEpoch =pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_mobi_walk.set']); 
-baseSTATEpoch =pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_stat_walk.set']);
+function [ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi, elecNames)
 
-fft_options = struct();
-fft_options.cycles = [3 0.25];
-fft_options.freqrange = [3 20];
-fft_options.freqscale = 'log';
-fft_options.padratio = 2;
-fft_options.alpha = NaN;
-fft_options.powbase = NaN;
+freqRange = [3 20];
+cycles = [3 0.25];
+padratio = 2;
+baseline = NaN;
 
-ERSPAllMOBI = {}; 
-EEG = baseMOBIEpoch;
-for Ei = elecInds
-    [ERSP,~,~,times,freqs,~,~] = newtimef(EEG.data(Ei,:,:),...
-        EEG.pnts,...
-        [EEG.times(1) EEG.times(end)],...
-        EEG.srate,...
-        'cycles',fft_options.cycles,...
-        'freqs',fft_options.freqrange,...
-        'freqscale',fft_options.freqscale,...
-        'padratio',fft_options.padratio,...
-        'alpha',fft_options.alpha,...   
-        'powbase',fft_options.powbase,...
-        'baseline',NaN,... % activity before 0 ms is used as baseline 
-        'plotersp','off',...
-        'plotitc','off',...
-        'verbose','off');
+baseMOBISet     = pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_mobi_walk.set']); 
+baseSTATSet     = pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_stat_walk.set']);
+baseMOBIEpoch   = eeglab2fieldtrip(baseMOBISet, 'raw'); 
+baseSTATEpoch   = eeglab2fieldtrip(baseSTATSet, 'raw'); 
+
+ERSPAllMOBI = {};
+ERSPAllSTAT = {};
+
+for Ei = 1:numel(elecNames)
+    cfg                     = [];
+    cfg.output              = 'pow';
+    cfg.method              = 'mtmconvol';
+    cfg.channel             = elecNames{Ei};
+    cfg.taper               = 'hanning';
+    cfg.foi                 = freqRange(1):1:freqRange(2);
+    cfg.t_ftimwin           = ones(length(cfg.foi),1).*0.3;
+    cfg.toi                 = 'all';
+    cfg.pad                 = 'nextpow2';
+    cfg.padratio            = padratio;
+    cfg.baseline            = baseline;
+    cfg.datatype            = 'raw';
+    mobifreq                = ft_freqanalysis(cfg, baseMOBIEpoch);
+    statfreq                = ft_freqanalysis(cfg, baseSTATEpoch);
     
-    ERSPAllMOBI{end+1} = ERSP; 
+    ERSPAllMOBI{end+1}      = mobifreq.powspctrm;
+    ERSPAllSTAT{end+1}      = statfreq.powspctrm;
 end
 
-
-ERSPAllSTAT = {}; 
-EEG = baseSTATEpoch;
-for Ei = elecInds
-    [ERSP,~,~,times,freqs,~,~] = newtimef(EEG.data(Ei,:,:),...
-        EEG.pnts,...
-        [EEG.times(1) EEG.times(end)],...
-        EEG.srate,...
-        'cycles',fft_options.cycles,...
-        'freqs',fft_options.freqrange,...
-        'freqscale',fft_options.freqscale,...
-        'padratio',fft_options.padratio,...
-        'alpha',fft_options.alpha,...   
-        'powbase',fft_options.powbase,...
-        'baseline',NaN,... % activity before 0 ms is used as baseline 
-        'plotersp','off',...
-        'plotitc','off',...
-        'verbose','off');
-    
-    ERSPAllSTAT{end+1} = ERSP; 
-end
+times = mobifreq.time;
+freqs = mobifreq.freq; 
 
 end
