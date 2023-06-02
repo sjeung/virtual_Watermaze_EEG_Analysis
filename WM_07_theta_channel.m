@@ -20,27 +20,25 @@ function WM_07_theta_channel(Pi, elecGroup)
 %--------------------------------------------------------------------------
 % load configs
 WM_config;
-
+freqRange = config_param.ERSP_freq_range; 
 elecInds = elecGroup.chan_inds;
 
-%[epochedFileNameStart,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, '_epoched_start.set', Pi);
-%[epochedFileNameEnd,epochedFileDir]     = assemble_file(config_folder.data_folder, config_folder.epoched_folder, '_epoched_end.set', Pi);
-[cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, '5_post-AMICA', '_cleaned_with_ICA.set', Pi);
-[erspFileName,erspFileDir]          = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_ERSP_' elecGroup.key '.mat'], Pi);
-
-[epochedFileName,epochedFileDir]            = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
 [erspFileName,erspFileDir]                  = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_ERSP_' elecGroup.key '.mat'], Pi);
 
-load(fullfile(epochedFileDir, epochedFileName), 'ftEEG'); 
 
 %% 1. Compute baseline
-[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,elecGroup.chan_names); 
+[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,elecGroup.chan_names, freqRange); 
 
 %% 2. Time-frequency analysis of entire trials for timewarping later 
-[ERSPLearnS] = util_WM_ERSP(EEG, elecInds, 'learn', 'stat');
-[ERSPLearnM] = util_WM_ERSP(EEG, elecInds, 'learn', 'mobi');
-[ERSPProbeS] = util_WM_ERSP(EEG, elecInds, 'probe', 'stat');
-[ERSPProbeM] = util_WM_ERSP(EEG, elecInds, 'probe', 'mobi');
+[ERSPLearnSRaw] = util_WM_ERSP(elecGroup.chan_names, 'learn', 'stat', Pi, freqRange);
+[ERSPLearnMRaw] = util_WM_ERSP(elecGroup.chan_names, 'learn', 'mobi', Pi, freqRange);
+[ERSPProbeSRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'stat', Pi, freqRange);
+[ERSPProbeMRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'mobi', Pi, freqRange);
+
+[ERSPLearnS] = util_WM_basecorrect(ERSPLearnSRaw, ERSPAllSTAT);
+[ERSPLearnM] = util_WM_basecorrect(ERSPLearnMRaw, ERSPAllMOBI);
+[ERSPProbeS] = util_WM_basecorrect(ERSPProbeSRaw, ERSPAllSTAT);
+[ERSPProbeM] = util_WM_basecorrect(ERSPProbeMRaw, ERSPAllMOBI);
 
 %% 3. Analysis of the start and end of trials
 [ERSPLearnMobiStart, ERSPLearnMobiEnd, times, freqs]  = util_WM_cut_windows(ERSPLearnM, freqs, 5);
@@ -48,7 +46,6 @@ load(fullfile(epochedFileDir, epochedFileName), 'ftEEG');
 [ERSPProbeMobiStart, ERSPProbeMobiEnd, times, freqs]  = util_WM_cut_windows(ERSPProbeM, freqs, 5);
 
 
-[ERSPLearnMobiStart] = util_WM_basecorrect(ERSPLearnMobiStart, ERSPAllMOBI);
 
 figTitle        = [num2str(Pi) ', Learn Start, MoBI']; 
 figFilename     = [num2str(Pi) '_ERSP_L_S_M_' elecGroup.key '.png'];

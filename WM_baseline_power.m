@@ -1,9 +1,4 @@
-function [ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi, elecNames)
-
-freqRange = [3 20];
-cycles = [3 0.25];
-padratio = 2;
-baseline = NaN;
+function [ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi, elecNames, freqRange)
 
 baseMOBISet     = pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_mobi_walk.set']); 
 baseSTATSet     = pop_loadset('filepath', ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\7_epoched\sub-' num2str(Pi)], 'filename', ['sub-' num2str(Pi) '_stat_walk.set']);
@@ -23,8 +18,8 @@ for Ei = 1:numel(elecNames)
     cfg.t_ftimwin           = ones(length(cfg.foi),1).*0.3;
     cfg.toi                 = 'all';
     cfg.pad                 = 'nextpow2';
-    cfg.padratio            = padratio;
-    cfg.baseline            = baseline;
+    cfg.padratio            = 4;
+    cfg.baseline            = NaN;
     cfg.datatype            = 'raw';
     mobifreq                = ft_freqanalysis(cfg, baseMOBIEpoch);
     statfreq                = ft_freqanalysis(cfg, baseSTATEpoch);

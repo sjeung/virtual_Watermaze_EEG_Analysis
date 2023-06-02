@@ -23,8 +23,7 @@ config_folder.postAMICA_folder         = '5_post-AMICA';
 config_folder.cleaned_folder           = '6_cleaned'; 
     config_folder.cleanedFileName             = '_cleaned.set';       
 config_folder.epoched_folder           = '7_epoched';                       % from here on .set is not used anymore and mainly fieldtrip is used                 
-    config_folder.epochedFileName         = '_epoched.set';
-
+    config_folder.epochedFileName         = '_epoched.mat';
     
 % results folder and file names 
 %--------------------------------------------------------------------------
@@ -35,7 +34,7 @@ config_folder.band_folder           = 'bandpower';
 %% Parameters 
 % IC cleaning 
 %--------------------------------------------------------------------------
-config_param.IC_threshold    = 0.9; 
+config_param.IC_threshold    = 0.8; 
 
 % Beamforming 
 %--------------------------------------------------------------------------
@@ -49,6 +48,8 @@ config_param.memscore_iterations = [];
 
 % ERSP analysis
 %--------------------------------------------------------------------------
+config_param.ERSP_freq_range = [3,20];
+
 load('ExampleChanLoc.mat', 'exampleChanLoc'); % only load to match channel names with channel indices
 chanLabels                  = {exampleChanLoc.labels}; 
 
