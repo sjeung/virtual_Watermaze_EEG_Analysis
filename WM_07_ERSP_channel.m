@@ -1,4 +1,4 @@
-function WM_07_theta_channel(Pi, elecGroup)
+function WM_07_ERSP_channel(Pi, elecGroup)
 % time-frequency analysis channel level 
 %
 % Inputs 
@@ -20,14 +20,14 @@ function WM_07_theta_channel(Pi, elecGroup)
 %--------------------------------------------------------------------------
 % load configs
 WM_config;
-freqRange = config_param.ERSP_freq_range; 
-elecInds = elecGroup.chan_inds;
-
+freqRange   = config_param.ERSP_freq_range; 
 [erspFileName,erspFileDir]                  = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_ERSP_' elecGroup.key '.mat'], Pi);
 
 
 %% 1. Compute baseline
-[ERSPAllMOBI, ERSPAllSTAT, times, freqs] = WM_baseline_power(Pi,elecGroup.chan_names, freqRange); 
+%[ERSPAllMOBI, ERSPAllSTAT] = WM_baseline_power(Pi,elecGroup.chan_names, freqRange); 
+[ERSPBaseMOBI]   = util_WM_ERSP(elecGroup.chan_names, 'walk', 'stat', Pi, freqRange);
+[ERSPBaseSTAT]   = util_WM_ERSP(elecGroup.chan_names, 'walk', 'mobi', Pi, freqRange);
 
 %% 2. Time-frequency analysis of entire trials for timewarping later 
 [ERSPLearnSRaw] = util_WM_ERSP(elecGroup.chan_names, 'learn', 'stat', Pi, freqRange);
@@ -35,16 +35,15 @@ elecInds = elecGroup.chan_inds;
 [ERSPProbeSRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'stat', Pi, freqRange);
 [ERSPProbeMRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'mobi', Pi, freqRange);
 
-[ERSPLearnS] = util_WM_basecorrect(ERSPLearnSRaw, ERSPAllSTAT);
-[ERSPLearnM] = util_WM_basecorrect(ERSPLearnMRaw, ERSPAllMOBI);
-[ERSPProbeS] = util_WM_basecorrect(ERSPProbeSRaw, ERSPAllSTAT);
-[ERSPProbeM] = util_WM_basecorrect(ERSPProbeMRaw, ERSPAllMOBI);
+[ERSPLearnS] = util_WM_basecorrect(ERSPLearnSRaw, ERSPBaseSTAT);
+[ERSPLearnM] = util_WM_basecorrect(ERSPLearnMRaw, ERSPBaseMOBI);
+[ERSPProbeS] = util_WM_basecorrect(ERSPProbeSRaw, ERSPBaseSTAT);
+[ERSPProbeM] = util_WM_basecorrect(ERSPProbeMRaw, ERSPBaseMOBI);
 
 %% 3. Analysis of the start and end of trials
 [ERSPLearnMobiStart, ERSPLearnMobiEnd, times, freqs]  = util_WM_cut_windows(ERSPLearnM, freqs, 5);
 [ERSPProbeStatStart, ERSPProbeStatEnd, times, freqs]  = util_WM_cut_windows(ERSPProbeS, freqs, 5);
 [ERSPProbeMobiStart, ERSPProbeMobiEnd, times, freqs]  = util_WM_cut_windows(ERSPProbeM, freqs, 5);
-
 
 
 figTitle        = [num2str(Pi) ', Learn Start, MoBI']; 
