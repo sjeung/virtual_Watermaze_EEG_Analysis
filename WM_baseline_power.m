@@ -8,27 +8,25 @@ baseSTATEpoch   = eeglab2fieldtrip(baseSTATSet, 'raw');
 ERSPAllMOBI = {};
 ERSPAllSTAT = {};
 
-for Ei = 1:numel(elecNames)
-    cfg                     = [];
-    cfg.output              = 'pow';
-    cfg.method              = 'mtmconvol';
-    cfg.channel             = elecNames{Ei};
-    cfg.taper               = 'hanning';
-    cfg.foi                 = freqRange(1):1:freqRange(2);
-    cfg.t_ftimwin           = ones(length(cfg.foi),1).*0.3;
-    cfg.toi                 = 'all';
-    cfg.pad                 = 'nextpow2';
-    cfg.padratio            = 4;
-    cfg.baseline            = NaN;
-    cfg.datatype            = 'raw';
-    mobifreq                = ft_freqanalysis(cfg, baseMOBIEpoch);
-    statfreq                = ft_freqanalysis(cfg, baseSTATEpoch);
-    
-    ERSPAllMOBI{end+1}      = mobifreq.powspctrm;
-    ERSPAllSTAT{end+1}      = statfreq.powspctrm;
-end
+cfg                     = [];
+cfg.output              = 'pow';
+cfg.method              = 'mtmconvol';
+cfg.channel             = elecNames;
+cfg.taper               = 'hanning';
+cfg.foi                 = freqRange(1):1:freqRange(2);
+cfg.t_ftimwin           = ones(length(cfg.foi),1).*0.3;
+cfg.toi                 = 'all';
+cfg.pad                 = 'nextpow2';
+cfg.padratio            = 4;
+cfg.baseline            = NaN;
+cfg.datatype            = 'raw';
+mobifreq                = ft_freqanalysis(cfg, baseMOBIEpoch);
+statfreq                = ft_freqanalysis(cfg, baseSTATEpoch);
+
+ERSPAllMOBI             = mobifreq.powspctrm;
+ERSPAllSTAT             = statfreq.powspctrm;
 
 times = mobifreq.time;
-freqs = mobifreq.freq; 
+freqs = mobifreq.freq;
 
 end
