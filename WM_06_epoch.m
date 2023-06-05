@@ -4,8 +4,7 @@ function WM_06_epoch(Pi)
 % 
 % authors : Berrak Hosgoren, Sein Jeung
 %--------------------------------------------------------------------------
-%% load data 
-%--------------------------------------------------------------------------
+
 WM_config;                                                                  % load configs
 
 trialTypes                          = {'learn', 'probe'}; 
@@ -14,6 +13,11 @@ timeBuffer                          = 1;                                    % in
 
 [cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, config_folder.cleaned_folder, config_folder.cleanedFileName, Pi);
 
+% baseline epoching
+WM_baseline_epoch(Pi); 
+ 
+%% load data 
+%--------------------------------------------------------------------------
 EEG = pop_loadset('filepath', cleanedFileDir, 'filename', cleanedFileName);
 
 % extract trials

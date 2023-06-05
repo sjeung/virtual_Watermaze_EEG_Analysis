@@ -1,7 +1,7 @@
 function WM_baseline_epoch(Pi)
 
 epochWidth = 5; % in seconds
-EEG = pop_loadset(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\5_post-AMICA\sub-' num2str(Pi), '\sub-' num2str(Pi) '_cleaned_with_ICA.set']); 
+EEG = pop_loadset(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\6_cleaned\sub-' num2str(Pi), '\sub-' num2str(Pi) '_cleaned.set']); 
 
 standingStarts  = find(contains({EEG.event(:).type},'standing:start'));
 standingEnds    = find(contains({EEG.event(:).type},'standing:end'));

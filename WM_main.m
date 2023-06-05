@@ -25,10 +25,10 @@ for Pi = allParticipants
 %     WM_04_amica(Pi)
 %     
 %     % 05. IC based cleaning
-%     WM_05_IC_clean % not properly working yet - using pipeline default
+      WM_05_IC_clean(Pi)
     
- %       %% 06. epoch 
- %WM_06_epoch(Pi)
+       %% 06. epoch 
+       WM_06_epoch(Pi)
     
  %% 07. channel level TFR
  try
