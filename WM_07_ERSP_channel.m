@@ -35,6 +35,9 @@ freqRange   = config_param.ERSP_freq_range;
 [ERSPProbeSRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'stat', Pi, freqRange);
 [ERSPProbeMRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'mobi', Pi, freqRange);
 
+% visualize trial lengths
+util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProbeMRaw, Pi, WM_config); 
+
 [ERSPLearnS] = util_WM_basecorrect(ERSPLearnSRaw, ERSPBaseSTAT);
 [ERSPLearnM] = util_WM_basecorrect(ERSPLearnMRaw, ERSPBaseMOBI);
 [ERSPProbeS] = util_WM_basecorrect(ERSPProbeSRaw, ERSPBaseSTAT);
