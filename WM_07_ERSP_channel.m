@@ -41,22 +41,17 @@ util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProb
 [ERSPBaseSTAT]   = util_WM_ERSP(elecGroup.chan_names, 'walk', 'mobi', Pi, freqRange);
 
 % correct trial data using common baseline
-[ERSPLearnS] = util_WM_basecorrect(ERSPLearnSRaw, ERSPBaseSTAT);
-[ERSPLearnM] = util_WM_basecorrect(ERSPLearnMRaw, ERSPBaseMOBI);
-[ERSPProbeS] = util_WM_basecorrect(ERSPProbeSRaw, ERSPBaseSTAT);
-[ERSPProbeM] = util_WM_basecorrect(ERSPProbeMRaw, ERSPBaseMOBI);
-
-% visualize baseline correction results 
-util_WM_plot_baseline();
+[ERSPLearnS] = util_WM_basecorrect(ERSPLearnSRaw, ERSPBaseSTAT, Pi, 'learn_stat');
+[ERSPLearnM] = util_WM_basecorrect(ERSPLearnMRaw, ERSPBaseMOBI, Pi, 'learn_mobi');
+[ERSPProbeS] = util_WM_basecorrect(ERSPProbeSRaw, ERSPBaseSTAT, Pi, 'probe_stat');
+[ERSPProbeM] = util_WM_basecorrect(ERSPProbeMRaw, ERSPBaseMOBI, Pi, 'probe_mobi');
 
 %% 3. Analysis of the start and end of trials
-
 [ERSPLearnMobiStart, ERSPLearnMobiEnd, times, freqs]  = util_WM_cut_windows(ERSPLearnM, freqs, 5);
 [ERSPProbeStatStart, ERSPProbeStatEnd, times, freqs]  = util_WM_cut_windows(ERSPProbeS, freqs, 5);
 [ERSPProbeMobiStart, ERSPProbeMobiEnd, times, freqs]  = util_WM_cut_windows(ERSPProbeM, freqs, 5);
 
 
-%% 4. Visualize 
 figTitle        = [num2str(Pi) ', Learn Start, MoBI']; 
 figFilename     = [num2str(Pi) '_ERSP_L_S_M_' elecGroup.key '.png'];
 
@@ -64,6 +59,7 @@ util_WM_plot_ERSP(ERSPLearnMobiStart, times, freqs, figTitle, fullfile(erspFileD
 util_WM_plot_ERSP(ERSPLearnStatStart, times, freqs, figTitle, fullfile(erspFileDir, figFilename), [])
 
 %% 4. Time-warped analysis
+
 [ERSPLearnStart, times, freqs]  = util_WM_cut_windows(ERSPLearnS, 'start', 5,1);
 
 %% 5. Space-based analysis 

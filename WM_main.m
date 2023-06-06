@@ -33,7 +33,7 @@ for Pi = allParticipants
  %% 07. channel level TFR
  try
      for Gi = 1:numel(config_param.chanGroups)
-         WM_07_theta_channel(Pi,config_param.chanGroups(Gi))
+         WM_07_ERSP_channel(Pi,config_param.chanGroups(Gi))
      end
  catch
      errorParticipants(end+1) = Pi;
