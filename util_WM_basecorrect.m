@@ -1,37 +1,25 @@
 function [ERSPcorr] = util_WM_basecorrect(ERSPdata, ERSPbase)
+% divide (or subtract) baseline ERSP from data
+%--------------------------------------------------------------------------
 
-basePower       = mean(ERSPbase,3, 'omitnan');                              % baseline power nChan X freqs 
-ERSPcorr        = ERSPdata;                                                 % copy data structure of input
+% issue warning if freq points differ too much
+timeDiff        = abs(ERSPbase.freq - ERSPdata.freq); 
+assert(~any(timeDiff > 0.3));                                               % difference frequencies should be under 0.3 Hz
 
-for Ti = 1:size(ERSPdata.powspctrm,1) % iterate over trials
-    data                            = ERSPdata.powspctrm(Ti,:,:,:);
-    baselineMat                     = repmat(basePower, [1,1,1,size(data,4)]);
-    baselineMat                     = permute(baselineMat, [3,1,2,4]);
-    corrData                        = data./baselineMat;
-    ERSPcorr.powspctrm(Ti,:,:,:)    = corrData;
-end
+% average baseilne data over trials and samples 
+baseMean    = mean(mean(ERSPbase.powspctrm, 4, 'omitnan'),1,'omitnan');
+baseMat     = repmat(baseMean, size(ERSPdata.powspctrm,1),1,1,size(ERSPdata.powspctrm,4));
 
-% Plot the ERSP using FieldTrip functions
-figure;
-cfg             = [];
-cfg.colorbar    = 'yes';  % Display colorbar
-cfg.xlim        = [-1,5];
-ft_singleplotTFR(cfg, ERSPdata);
-
+ERSPcorr                        = ERSPdata;                                 % copy data structure of the input                              
+ERSPcorr.powspctrm              = ERSPdata.powspctrm ./ baseMat;
 
 % Plot the ERSP using FieldTrip functions
-figure;
 cfg             = [];
-cfg.channel     = {'y32'};
-%cfg.baseline = [-0.7 -0.1];
-%cfg.baselinetype = 'absolute';
 cfg.colorbar    = 'yes';  % Display colorbar
-cfg.xlim        = [-0.5,3];
-cfg.zlim        = [0, 10]
+cfg.xlim        = [-0.7,10];
+cfg.zlim        = [0,4];
+f = figure;
 ft_singleplotTFR(cfg, ERSPcorr);
 
-
-
-ERSPcorr = ERSPdata; 
 
 end
