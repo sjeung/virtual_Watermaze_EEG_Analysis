@@ -14,8 +14,16 @@ baseMat     = repmat(baseMean, size(ERSPdata.powspctrm,1),1,1,size(ERSPdata.pows
 ERSPcorr                        = ERSPdata;                                 % copy data structure of the input                              
 ERSPcorr.powspctrm              = ERSPdata.powspctrm ./ baseMat;
 
-% Plot the ERSP using FieldTrip functions
+% save data
+[erspFileName,erspFileDir] = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_' condText '_ERSP.mat'], Pi);
 
+if ~isfolder(erspFileDir)
+    mkdir(erspFileDir)
+end
+
+save(fullfile(erspFileDir, erspFileName), 'ERSPcorr'); 
+
+% plot the ERSP using FieldTrip functions
 f = figure;
 cfg             = [];
 cfg.colorbar    = 'yes';  % Display colorbar
@@ -38,8 +46,7 @@ subplot(1,3,3)
 cfg.xlim        = [-0.5,3];
 ft_singleplotTFR(cfg, ERSPcorr);
 title('Corrected ERSP', 'FontSize', 15)
-
-[~,erspFileDir]  = assemble_file(config_folder.results_folder, config_folder.ersp_folder, [], Pi);
+    
 saveas(f, fullfile(erspFileDir, ['sub-' num2str(Pi) '_' condText '_baseline.png']))
 close(f)
 
