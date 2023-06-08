@@ -1,4 +1,5 @@
 function util_WM_plot_trial_lengths(learnSTAT, learnMOBI, probeSTAT, probeMOBI, Pi) 
+WM_config; 
 
 f = figure;
 ERSPs           = {learnSTAT, learnMOBI, probeSTAT, probeMOBI};
@@ -20,6 +21,11 @@ for Fi = 1:4
 end
 
 [~,erspFileDir]  = assemble_file(config_folder.results_folder, config_folder.ersp_folder, [], Pi);
+
+if ~isfolder(erspFileDir)
+    mkdir(erspFileDir)
+end
+
 saveas(f, fullfile(erspFileDir, ['sub-' num2str(Pi) '_trial_lengths.png']))
 close(f);
 

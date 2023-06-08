@@ -1,13 +1,10 @@
 function [ERSP] = util_WM_ERSP(elecNames, trialType, session, Pi, freqRange)
-
-WM_config
+WM_config; 
+[epochedFileName,epochedFileDir] = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
 
 % load data
-[epochedFileName,epochedFileDir] = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
 load(fullfile(epochedFileDir, epochedFileName), 'ftEEG');
 EEG = ftEEG;
-
-timeBuffer = 1; % buffer time pre- and post- epoch
 
 cfg                     = [];
 cfg.output              = 'pow';
@@ -23,12 +20,5 @@ cfg.baseline            = NaN;
 cfg.datatype            = 'raw';
 cfg.keeptrials          = 'yes';
 ERSP                    = ft_freqanalysis(cfg, EEG);
-
-% % Plot the ERSP using FieldTrip functions
-% figure;
-% cfg             = [];
-% cfg.colorbar    = 'yes';  % Display colorbar
-% cfg.xlim        = [10,15];
-% ft_singleplotTFR(cfg, ERSP);
 
 end

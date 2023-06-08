@@ -12,6 +12,7 @@ allParticipants = setdiff(allParticipants,excluded);
 
 %% 01.Import files 
 %WM_01_import
+
 errorParticipants = []; 
 for Pi = allParticipants
     
@@ -30,23 +31,20 @@ for Pi = allParticipants
        %% 06. epoch 
        WM_06_epoch(Pi)
     
- %% 07. channel level TFR
+ %% 07-09. channel level TFR and temporal/spatial analyiss
  try
      for Gi = 1:numel(config_param.chanGroups)
          WM_07_ERSP_channel(Pi,config_param.chanGroups(Gi))
+         WM_08_ERSP_temporal(Pi,config_param.chanGroups(Gi)) 
+         WM_09_ERSP_spatial(Pi,config_param.chanGroups(Gi))
      end
  catch
      errorParticipants(end+1) = Pi;
  end
  
-try
-     WM_08_bandpower(Pi);
-catch
-    errorParticipants(end+1) = Pi;
-end
 end
 
-% Run statistics on ERSP results
+%% Aggregate ERSP results
 %--------------------------------------------------------------------------
 trialTypes = {'learn', 'probe'}; 
 
@@ -73,7 +71,6 @@ for Ti = 1:2
     
     save(fullfile(config_folder.results_folder, config_folder.ersp_folder, ['stats_' trialType '.mat']), 'statArray');
 end
-
 
 for Ti = 1:2
     

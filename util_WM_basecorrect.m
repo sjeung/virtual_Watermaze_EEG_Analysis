@@ -1,4 +1,4 @@
-function [ERSPcorr] = util_WM_basecorrect(ERSPdata, ERSPbase, Pi, condText)
+function util_WM_basecorrect(ERSPdata, ERSPbase, Pi, condText)
 % divide (or subtract) baseline ERSP from data
 %--------------------------------------------------------------------------
 WM_config;
