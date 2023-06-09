@@ -111,7 +111,7 @@ for iSession    = 1:2
         ftMotion.hdr.nTrials    = numel(latencies) - 1;
         
         [baselineFileName,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' baselineTrialType '_' session '_epoched.mat'], Pi);
-        [baselineMotionFileName,~]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_motion_' baselineTrialType '_' session '_epoched.mat'], Pi);
+        [baselineMotionFileName,~]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' baselineTrialType '_' session '_motion_epoched.mat'], Pi);
         
         save(fullfile(epochedFileDir, baselineFileName), 'ftEEG');
         save(fullfile(epochedFileDir, baselineMotionFileName), 'ftMotion');
@@ -163,7 +163,7 @@ for iSession    = 1:2
         end
         
         [epochedFileName,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
-        [epochedMotionFileName,~]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_motion_' trialType '_' session '_epoched.mat'], Pi);
+        [epochedMotionFileName,~]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_motion_epoched.mat'], Pi);
         
         save(fullfile(epochedFileDir, epochedFileName), 'ftEEG');
         save(fullfile(epochedFileDir, epochedMotionFileName), 'ftMotion');
