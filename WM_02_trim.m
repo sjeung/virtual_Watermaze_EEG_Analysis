@@ -5,7 +5,7 @@ function WM_02_trim(Pi)
 WM_config; 
 
 [rawEEGFileName, rawEEGFileDir] = assemble_file(config_folder.data_folder, config_folder.set_folder, config_folder.rawFileNameEEG, Pi); 
-[rawMOTIONFileName, rawMOTIONFileDir] = assemble_file(config_folder.data_folder, config_folder.set_folder, config_folder.rawFileNameEEG, Pi); 
+[rawMOTIONFileName, rawMOTIONFileDir] = assemble_file(config_folder.data_folder, config_folder.set_folder, config_folder.rawFileNameMotion, Pi); 
 [trimmedEEGFileName, trimmedEEGFileDir] = assemble_file(config_folder.data_folder, config_folder.trimmed_folder, config_folder.trimmedFileNameEEG, Pi); 
 [trimmedMOTIONFileName, trimmedMOTIONFileDir] = assemble_file(config_folder.data_folder, config_folder.trimmed_folder, config_folder.trimmedFileNameMotion, Pi); 
 
