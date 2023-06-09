@@ -14,6 +14,7 @@ epochWidth                          = 5; % in seconds
 timeBuffer                          = 1;                                    % in seconds (trials will be cut with -buffer, +buffer around the edge events)
 
 [cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, config_folder.cleaned_folder, config_folder.cleanedFileName, Pi);
+[motionFileName,motionFileDir]      = assemble_file(config_folder.data_folder, config_folder.trimmed_folder, config_folder.trimmedFileNameMotion, Pi);
 [~,epochedFileDir]                  = assemble_file(config_folder.data_folder, config_folder.epoched_folder, '', Pi);
 
 if ~isfolder(epochedFileDir)
@@ -22,8 +23,9 @@ end
 
 %% load data
 %--------------------------------------------------------------------------
-EEG = pop_loadset('filepath', cleanedFileDir, 'filename', cleanedFileName);
-
+EEG             = pop_loadset('filepath', cleanedFileDir, 'filename', cleanedFileName);
+MOTION          = pop_loadset('filepath', motionFileDir, 'filename', motionFileName); 
+ 
 % extract standing and walking baselines
 standingStarts  = find(contains({EEG.event.type},'standing:start'));
 standingEnds    = find(contains({EEG.event.type},'standing:end'));
@@ -53,8 +55,9 @@ learnTrials = [EEG.event(lStarts).latency; EEG.event(lEnds).latency];       % 2 
 probeTrials = [EEG.event(pStarts).latency; EEG.event(pEnds).latency];       % 2 x N vector consisting of start and end indices
 
 % construct fieldtrip header information
-hdr             = ft_read_header(fullfile(cleanedFileDir, cleanedFileName), 'filename', cleanedFileName);
+hdr             = ft_read_header(fullfile(cleanedFileDir, cleanedFileName));
 hdr.chanunit    = repmat({'uV'}, 1, hdr.nChans);
+motionhdr       = ft_read_header(fullfile(motionFileDir, motionFileName));
 
 for iSession    = 1:2
     
@@ -72,6 +75,12 @@ for iSession    = 1:2
         ftEEG.trial     = {};
         ftEEG.time      = {}; % unit is seconds
         
+        ftMotion        = [];
+        ftMotion.hdr    = motionhdr; 
+        ftMotion.label  = motionhdr.label; 
+        ftMotion.trial  = {};
+        ftMotion.time   = {}; 
+
         % define learn versus probe trials
         if strcmp(baselineTrialType, 'stand')
             baseTrials  = standingTrials;
@@ -80,7 +89,7 @@ for iSession    = 1:2
         end
         
         % extract data
-        for Bi = (iSession-1)*3+1:(iSession-1)*3 + 3                    % blocks 1-3 are mobi, 4-6 are stationary
+        for Bi = (iSession-1)*3+1:(iSession-1)*3 + 3                        % blocks 1-3 are mobi, 4-6 are stationary
             
             blockStart  = baseTrials(1,Bi);
             blockEnd    = baseTrials(2,Bi);
@@ -91,14 +100,22 @@ for iSession    = 1:2
             for Li = 1:numel(latencies) - 1
                 ftEEG.trial{end + 1} = EEG.data(:,latencies(Li):latencies(Li+1));
                 ftEEG.time{end + 1} = linspace(0,epochWidth, size(ftEEG.trial{end},2)); % convert to seconds
+                
+                ftMotion.trial{end + 1} = MOTION.data(:,latencies(Li):latencies(Li+1));
+                ftMotion.time{end + 1} = linspace(0,epochWidth, size(ftMotion.trial{end},2)); % convert to seconds
             end
             
         end
         
-        ftEEG.hdr.nTrials     = numel(latencies) - 1;
+        ftEEG.hdr.nTrials       = numel(latencies) - 1;
+        ftMotion.hdr.nTrials    = numel(latencies) - 1;
         
         [baselineFileName,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' baselineTrialType '_' session '_epoched.mat'], Pi);
+        [baselineMotionFileName,~]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_motion_' baselineTrialType '_' session '_epoched.mat'], Pi);
+        
         save(fullfile(epochedFileDir, baselineFileName), 'ftEEG');
+        save(fullfile(epochedFileDir, baselineMotionFileName), 'ftMotion');
+        
     end
     
     %% Epoch trials (various lengths)
@@ -127,17 +144,29 @@ for iSession    = 1:2
         ftEEG.label     = hdr.label;
         ftEEG.trial     = {};
         ftEEG.time      = {}; % unit is seconds
+
+        ftMotion        = [];
+        ftMotion.hdr    = motionhdr; 
+        ftMotion.label  = motionhdr.label;
+        ftMotion.trial  = {};
+        ftMotion.time   = {};
         
         % extract data
         for Ti = 1:size(trials, 2)
             tWindow = trials(1,Ti) - timeBuffer*EEG.srate:trials(2,Ti)+timeBuffer*EEG.srate; % in latency, for indexing data point
+            
             ftEEG.trial{end + 1} = EEG.data(:,tWindow);
             ftEEG.time{end + 1} = (tWindow - tWindow(1))/EEG.srate - timeBuffer; % convert to seconds
+            
+            ftMotion.trial{end + 1} = MOTION.data(:,tWindow);
+            ftMotion.time{end + 1} = (tWindow - tWindow(1))/MOTION.srate - timeBuffer; % convert to seconds
         end
         
         [epochedFileName,epochedFileDir]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
+        [epochedMotionFileName,~]    = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_motion_' trialType '_' session '_epoched.mat'], Pi);
         
         save(fullfile(epochedFileDir, epochedFileName), 'ftEEG');
+        save(fullfile(epochedFileDir, epochedMotionFileName), 'ftMotion');
     end
 end
 
