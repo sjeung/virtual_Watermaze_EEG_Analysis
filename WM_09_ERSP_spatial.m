@@ -49,9 +49,9 @@ MotionProbeM = MotionProbeM.ftMotion;
 
 %% Overlay power over spatial map and sort ERSP by target & center distance 
 fBand                   = [4,8]; 
-util_WM_ERSP_spatial_map(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', fBand)
-util_WM_ERSP_spatial_map(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', fBand)
-util_WM_ERSP_spatial_map(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', fBand)
-util_WM_ERSP_spatial_map(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', fBand)
+util_WM_ERSP_spatial_map(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, fBand)
+util_WM_ERSP_spatial_map(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, fBand)
+util_WM_ERSP_spatial_map(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, fBand)
+util_WM_ERSP_spatial_map(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, fBand)
 
 end

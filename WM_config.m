@@ -32,8 +32,8 @@ config_folder.band_folder           = 'bandpower';
 config_folder.beh_folder            = 'BEH_output'; 
     config_folder.behFileName       = '_beh_trials.mat'; 
     config_folder.behStructFileName     = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat'; % this is the og output from beh anaylsis
-
-
+config_folder.spatial_power_folder  = 'spatial_power'; 
+   
 
 %% Parameters 
 % IC cleaning 
