@@ -81,7 +81,12 @@ for Ti = 1:numel(motion.trial)
         if ~isempty(inds)
             powers  = squeeze(ERSP.powspctrm(Ti,:,:,inds));
             powers  = squeeze(mean(powers, 1));                             % average over electrodes
-            tdCell{tdBin} = [tdCell{:, tdBin} powers];                   % concatenate samples to normalize later
+            
+            if numel(inds) == 1
+                powers = powers';                                           % this prevents autotranspose in case only one sample is in bin
+            end
+            
+            tdCell{tdBin} = [tdCell{:, tdBin} powers];                      % concatenate samples to normalize later
         end
     end
     
@@ -90,7 +95,13 @@ for Ti = 1:numel(motion.trial)
         inds    = inds(inds > sRate*bufferSec);                             % cut off the 1 second onset buffer here;
         if ~isempty(inds)
             powers  = squeeze(ERSP.powspctrm(Ti,:,:,inds));
-            powers  = squeeze(mean(powers, 1));                             % average over electrodes
+            powers  = squeeze(mean(powers, 1));
+
+            if numel(inds) == 1
+                powers = powers';               
+            end
+            
+            % average over electrodes
             cdCell{cdBin} = [cdCell{:, cdBin} powers];                      % concatenate samples to normalize later
         end
     end
@@ -128,13 +139,13 @@ xticklabels = -4:1:4;
 xticks = linspace(1, size(ERSPMat, 2), numel(xticklabels));
 set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
 set(gca, 'YTick', xticks, 'YTickLabel', xticklabels)
-saveas(f,fullfile(spatialFileDir, ['sub-' num2str(Pi) '_distance.png']))
+saveas(f,fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_overlay.png']))
 close(f)
 
 % visualize distance ERSP
 f = figure; 
 set(gcf,'Position',[100 100 2500 500])
-yticklabels     = round(min(ERSP.freq)):4:round(max(ERSP.freq)); 
+yticklabels     = fliplr(round(min(ERSP.freq)):4:round(max(ERSP.freq))); 
 yticks          = linspace(1, size(cdMat, 1), numel(yticklabels));
 
 subplot(1,2,1)
@@ -157,7 +168,7 @@ set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
 xlabel('Distance')
 ylabel('Hz')
 
-saveas(f, fullfile(spatialFileDir, ['sub-' num2str(Pi) '_distance.png']))
+saveas(f, fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_distance.png']))
 close(f)
 
 end
