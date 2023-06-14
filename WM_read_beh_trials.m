@@ -1,6 +1,11 @@
-trialsStructPath    = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat';
-targetFolder        = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\'; 
-load(trialsStructPath, 'wm'); 
+trialsStructPath    = config_folder.behStructFileName;
+targetFolder        = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\BEH_output';
+
+if ~isfolder(targetFolder)
+    mkdir(targetFolder)
+end
+
+load(trialsStructPath, 'wm');
 
 groups  = 1:4;
 IDs     = 1:11;  
@@ -60,11 +65,11 @@ for Gi = groups
             end
            
             if strcmp(wm.setup{Si}.setup, 'desktop')
-                statLearn = learns; 
-                statProbe = probes; 
+                TrialLearnS = learns; 
+                TrialProbeS = probes; 
             elseif strcmp(wm.setup{Si}.setup, 'VR')
-                mobiLearn = learns; 
-                mobiProbe = probes; 
+                TrialLearnM = learns; 
+                TrialProbeM = probes; 
             end
             
             clear('learns'); clear('probes');
@@ -75,7 +80,7 @@ for Gi = groups
             warning(['Could not convert beh results for ' Pi])
         end
         
-    save(fullfile(targetFolder, [Pi '_beh_trials.mat']), 'mobiLearn', 'mobiProbe', 'statLearn', 'statProbe')
+    save(fullfile(targetFolder, ['sub-' Pi '_beh_trials.mat']), 'TrialLearnS', 'TrialProbeS', 'TrialLearnM', 'TrialProbeM')
         
     end % for Ii = IDs
 end

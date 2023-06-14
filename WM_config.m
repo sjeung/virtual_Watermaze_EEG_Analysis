@@ -10,7 +10,7 @@ config_folder.figures_folder   = fullfile(config_folder.project_folder, 'WM_EEG_
 % data folder and file names 
 %--------------------------------------------------------------------------
 config_folder.bids_folder              = '0_BIDS-data';
-config_folder.set_folder               = '1_basic-EEGLAB';
+config_folder.set_folder               = '1_basic-EEGLAB_HMD_only';
     config_folder.rawFileNameEEG              = '_merged_EEG.set'; 
     config_folder.rawFileNameMotion           = '_merged_MOTION.set'; 
 config_folder.trimmed_folder           = '2_trimmed'; 
@@ -29,6 +29,10 @@ config_folder.epoched_folder           = '7_epoched';                       % fr
 %--------------------------------------------------------------------------
 config_folder.ersp_folder           = 'ERSP'; 
 config_folder.band_folder           = 'bandpower'; 
+config_folder.beh_folder            = 'BEH_output'; 
+    config_folder.behFileName       = '_beh_trials.mat'; 
+    config_folder.behStructFileName     = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat'; % this is the og output from beh anaylsis
+
 
 
 %% Parameters 
@@ -38,7 +42,7 @@ config_param.IC_threshold    = 0.8;
 
 % Beamforming 
 %--------------------------------------------------------------------------
-config_param.ROI_names       = {'Hippocampus_L', 'Hippocampus_R', 'Parahippocampus_L', 'Parahippocampus_R'};
+config_param.ROI_names       = {'RSC', 'Prefrontal_cortex'};
 config_param.FOI_lower       = [5,  8,  14, 30, 60];
 config_param.FOI_upper       = [8,  14, 30, 60, 120]; 
 
