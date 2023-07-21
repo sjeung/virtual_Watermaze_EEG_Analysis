@@ -17,13 +17,13 @@ imagesclogy(times,...
     ERSPMean);%,...
 axis xy;
 ylabel('Frequency')
-xlabel('Time in ms')
+xlabel('Time in sec')
 title(figTitle,'Interpreter', 'none')
 xline(0,'black');
-xticks([0, 500, 1500, 2500])
-%caxis([-3, 3]); 
+xticks([0, 1, 2, 3])
 colormap(gca, jet);
 colorbar; 
+caxis([0, 4]);
 
 if ~isfolder(fileparts(figFullpath))
     mkdir(fileparts(figFullpath))
