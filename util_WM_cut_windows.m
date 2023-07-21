@@ -53,22 +53,22 @@ cfg.colorbar    = 'yes';  % Display colorbar
 cfg.zlim        = [0,4];
 cfg.figure      = 'gcf';
 
-for Ti = 1:size(ERSP.powspctrm, 1)
-    f = figure;
-    cfg.trials = Ti; 
-
-    subplot(1,2,1)
-    ft_singleplotTFR(cfg, ERSPStart); 
-    title('first 5 sec', 'FontSize', 15)
-
-    subplot(1,2,2)
-    ft_singleplotTFR(cfg, ERSPEnd);
-    title('last 5 sec', 'FontSize', 15)
-    set(gcf,'Position',[100 100 2500 500])
-    
-    saveas(f, fullfile(erspFileDir, 'trial_ERSPs', ['sub-' num2str(Pi) '_' condText '_trial-' num2str(Ti) '_ERSP.png']))
-    close(f);
-end
+% for Ti = 1:size(ERSP.powspctrm, 1)
+%     f = figure;
+%     cfg.trials = Ti; 
+% 
+%     subplot(1,2,1)
+%     ft_singleplotTFR(cfg, ERSPStart); 
+%     title('first 5 sec', 'FontSize', 15)
+% 
+%     subplot(1,2,2)
+%     ft_singleplotTFR(cfg, ERSPEnd);
+%     title('last 5 sec', 'FontSize', 15)
+%     set(gcf,'Position',[100 100 2500 500])
+%     
+%     saveas(f, fullfile(erspFileDir, 'trial_ERSPs', ['sub-' num2str(Pi) '_' condText '_trial-' num2str(Ti) '_ERSP.png']))
+%     close(f);
+% end
 
 f = figure; 
 cfg.trials      = 'all';
