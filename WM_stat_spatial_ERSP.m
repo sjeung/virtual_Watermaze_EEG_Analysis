@@ -1,4 +1,4 @@
-function WM_stat_spatial_ERSP(trialType, channelGroup)
+function WM_stat_spatial_ERSP(trialType, channelGroup, fBandText)
 
 % trialType = 'learn' or 'probe'
 %--------------------------------------------------------------------------
@@ -6,7 +6,7 @@ function WM_stat_spatial_ERSP(trialType, channelGroup)
 pThreshold      = 0.01; 
 nPermutations   = 1024; 
 
-this = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\spatial_power\sub-81001\sub-81001_' trialType '_spatial_power.mat']);
+this = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\spatial_power\sub-81001\sub-81001_' trialType '_spatial_power_' fBandText '.mat']);
 
 % highly annoying to work with this variable name - update later
 fn = fieldnames(this);
@@ -25,12 +25,12 @@ nanCount        = zeros(40,40); % keep track of how many times each bin had nan 
 
 for Pi = 81001:81011
     try
-        this =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\spatial_power\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_spatial_power.mat']);
+        this =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\spatial_power\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_spatial_power_' fBandText '.mat']);
         fn              = fieldnames(this);
         vn              = fn{1};
         ERSP            = this.(vn);
-        ERSP(isnan(ERSP))= 0;
         nanCount(isnan(ERSP)) = nanCount(isnan(ERSP)) + 1;  
+        ERSP(isnan(ERSP))= 0;
         ERSPp           = ERSPp + ERSP;
         pCount          = pCount + 1; 
     catch
@@ -38,12 +38,17 @@ for Pi = 81001:81011
    end
 end
 
+pCountMat   = ones(40,40)*pCount - nanCount; % populate a matrix with pCount and subtract nanCounts  
+ERSPpn      = ERSPp./pCountMat; 
+
+nanCount        = zeros(40,40); 
 for Pi = [82001:82011, 83001:83011, 84004]
     try
-        this =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\spatial_power\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_spatial_power.mat']);
+        this =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\spatial_power\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_spatial_power_' fBandText '.mat']);
         fn              = fieldnames(this);
         vn              = fn{1};
         ERSP            = this.(vn);
+        nanCount(isnan(ERSP)) = nanCount(isnan(ERSP)) + 1;  
         ERSP(isnan(ERSP))= 0;
         ERSPc           = ERSPc + ERSP;
         cCount          = cCount + 1;
@@ -52,8 +57,8 @@ for Pi = [82001:82011, 83001:83011, 84004]
    end
 end
  
-ERSPpn = ERSPp./pCount; 
-ERSPcn = ERSPc./cCount; 
+cCountMat   = ones(40,40)*cCount - nanCount; % populate a matrix with pCount and subtract nanCounts  
+ERSPcn = ERSPc./cCountMat; 
 
 
 figure; imagesc(ERSPpn, [0 5])
@@ -62,13 +67,6 @@ colorbar;
 figure; imagesc(ERSPcn, [0 5])
 colorbar; 
 title(['CTRL ' trialType], 'Interpreter', 'none')
-% 
-% pMat    = cat(3,ERSPp{:});
-% cMat    = cat(3,ERSPc{1:numel(ERSPp)});
-% [clusters, p_values, t_sums, permutation_distribution ] = permutest(pMat,cMat, 'true', pThreshold, nPermutations, 'true');
-% 
-% util_WM_plot_ERSP(ERSPp, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_' trialSection '.png'], [])
-% util_WM_plot_ERSP(ERSPc, timePoints, freqPoints, ['ERSP_CTRL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_ctrl_' trialType '_' channelGroup.key '_' trialSection '.png'], [])
-% 
+
 
 end

@@ -1,5 +1,5 @@
 
-function util_WM_ERSP_spatial_map(ERSP, motion, trials, condText, Pi, fBand)
+function util_WM_ERSP_spatial_map(ERSP, motion, trials, condText, Pi, fBand, chanGroupName)
 % plot ERSP data onto spatial map 
 % compute distance to target and boundary
 % 
@@ -129,46 +129,46 @@ for cdBin = 1:numel(cBinEdges)-1
     end
 end
 
-save(fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_spatial_power.mat']), 'cdMat','tdMat', 'ERSPMat')
+save(fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_spatial_power_' num2str(fBand(1)) 'to' num2str(fBand(2)) '_Hz_' chanGroupName '.mat']), 'cdMat','tdMat', 'ERSPMat')
 
-% visualize spatial overlay
-f = figure; imagesc(flipud(ERSPMat), [0,4]); hold on; colorbar; 
-
-title([num2str(Pi) ', power in space, ' condText], 'Interpreter', 'none')
-xticklabels = -4:1:4;
-xticks = linspace(1, size(ERSPMat, 2), numel(xticklabels));
-set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
-set(gca, 'YTick', xticks, 'YTickLabel', xticklabels)
-saveas(f,fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_overlay.png']))
-close(f)
-
-% visualize distance ERSP
-f = figure; 
-set(gcf,'Position',[100 100 2500 500])
-yticklabels     = fliplr(round(min(ERSP.freq)):4:round(max(ERSP.freq))); 
-yticks          = linspace(1, size(cdMat, 1), numel(yticklabels));
-
-subplot(1,2,1)
-imagesc(flipud(cdMat), [0,4]); hold on; colorbar; 
-title([num2str(Pi) ', Center distance, ' condText], 'Interpreter', 'none')
-xticklabels = 0:4; 
-xticks      = linspace(1, size(cdMat, 2), numel(xticklabels));
-set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
-set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
-xlabel('Distance')
-ylabel('Hz')
-
-subplot(1,2,2)
-imagesc(flipud(tdMat), [0,4]); hold on; colorbar; 
-title([num2str(Pi) ',Target distance, ' condText], 'Interpreter', 'none')
-xticklabels = 0:8; 
-xticks      = linspace(1, size(cdMat, 2), numel(xticklabels));
-set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
-set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
-xlabel('Distance')
-ylabel('Hz')
-
-saveas(f, fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_distance.png']))
-close(f)
+% % visualize spatial overlay
+% f = figure; imagesc(flipud(ERSPMat), [0,4]); hold on; colorbar; 
+% 
+% title([num2str(Pi) ', power in space, ' condText], 'Interpreter', 'none')
+% xticklabels = -4:1:4;
+% xticks = linspace(1, size(ERSPMat, 2), numel(xticklabels));
+% set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
+% set(gca, 'YTick', xticks, 'YTickLabel', xticklabels)
+% saveas(f,fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_overlay.png']))
+% close(f)
+% 
+% % visualize distance ERSP
+% f = figure; 
+% set(gcf,'Position',[100 100 2500 500])
+% yticklabels     = fliplr(round(min(ERSP.freq)):4:round(max(ERSP.freq))); 
+% yticks          = linspace(1, size(cdMat, 1), numel(yticklabels));
+% 
+% subplot(1,2,1)
+% imagesc(flipud(cdMat), [0,4]); hold on; colorbar; 
+% title([num2str(Pi) ', Center distance, ' condText], 'Interpreter', 'none')
+% xticklabels = 0:4; 
+% xticks      = linspace(1, size(cdMat, 2), numel(xticklabels));
+% set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
+% set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
+% xlabel('Distance')
+% ylabel('Hz')
+% 
+% subplot(1,2,2)
+% imagesc(flipud(tdMat), [0,4]); hold on; colorbar; 
+% title([num2str(Pi) ',Target distance, ' condText], 'Interpreter', 'none')
+% xticklabels = 0:8; 
+% xticks      = linspace(1, size(cdMat, 2), numel(xticklabels));
+% set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
+% set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
+% xlabel('Distance')
+% ylabel('Hz')
+% 
+% saveas(f, fullfile(spatialFileDir, ['sub-' num2str(Pi) '_' condText '_distance.png']))
+% close(f)
 
 end
