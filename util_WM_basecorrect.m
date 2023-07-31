@@ -21,6 +21,7 @@ baseMat     = repmat(baseMean, size(ERSPdata.powspctrm,1),1,1,size(ERSPdata.pows
 
 ERSPcorr                        = ERSPdata;                                 % copy data structure of the input                              
 ERSPcorr.powspctrm              = ERSPdata.powspctrm ./ baseMat;
+ERSPcorr.numoutliers            = numel(find(outInds));  
 
 % save data
 [erspFileName,erspFileDir] = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_' condText '_ERSP.mat'], Pi);
@@ -47,11 +48,13 @@ title('Uncorrected ERSP', 'FontSize', 15)
 
 subplot(1,3,2)
 cfg.xlim        = [0.2,3.7];
+cfg.trials      = find(~outInds); 
 ft_singleplotTFR(cfg, ERSPbase);
 title('Baseline ERSP', 'FontSize', 15)
 
 subplot(1,3,3)
 cfg.xlim        = [-0.5,3];
+cfg.trials      = 'all'; 
 ft_singleplotTFR(cfg, ERSPcorr);
 title('Corrected ERSP', 'FontSize', 15)
     
