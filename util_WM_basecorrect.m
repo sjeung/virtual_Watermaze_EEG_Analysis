@@ -11,8 +11,9 @@ end
 
 % remove outliers from baseline trials 
 baseTrials  = mean(ERSPbase.powspctrm, [2,3,4], 'omitnan'); 
-[~,outInds] = rmoutliers(baseTrials);                                       % extract outlier indices
- 
+%[~,outInds1] = rmoutliers(baseTrials);                                      % extract outlier indices
+[outInds,~] = util_WM_IQR(baseTrials);                                      % use IQR methods due to non-normal distribution
+
 % average baseline data over trials and samples 
 powerTrials                = mean(ERSPbase.powspctrm, 4, 'omitnan');        % trials X channels X freqs
 powerTrials(outInds,:,:)   = [];                                            % take out outlier trials
