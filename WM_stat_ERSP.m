@@ -1,4 +1,4 @@
-function [p_values, statStruct] = WM_stat_ERSP(trialType, trialSection, channelGroup)
+function [p_values] = WM_stat_ERSP(trialType, trialSection, channelGroup)
 
 % trialType = 'learn_stat', 'learn_mobi', 'probe_stat', *probe_mobi'
 % contrast participants versus controls
@@ -6,16 +6,15 @@ function [p_values, statStruct] = WM_stat_ERSP(trialType, trialSection, channelG
 % contrast rotated versus unrotated trials 
 %--------------------------------------------------------------------------
 
+% Parameters
+%--------------------------------------------------------------------------
 pThreshold      = 0.05; 
 nPermutations   = 2048; 
+frequencyBands  = [];
 
-statStruct = [];
+
 ERSPvar = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-81001\sub-81001_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat'], ['ERSP' trialSection]);
-
-% highly annoying to work with this variable name - update later
-fn = fieldnames(ERSPvar);
-vn = fn{1};
-ERSP = ERSPvar.(vn);
+fn = fieldnames(ERSPvar); vn = fn{1}; ERSP = ERSPvar.(vn); % highly annoying to work with this variable name - update later
 
 timePoints = ERSP.time; 
 freqPoints = ERSP.freq;
@@ -24,7 +23,7 @@ freqPoints = ERSP.freq;
 patientIDs      = 81001:81011; 
 controlIDs      = [82001:82011, 83001:83011, 84009];
 excludedIDs     = [81005, 82005, 83005, 81008]; % participant group 5 excluded due to psychosis. participant 81008 excluded due to massive spectral artefact
-patienIDs       = setdiff(patientIDs, excludedIDs); 
+patientIDs      = setdiff(patientIDs, excludedIDs); 
 controlIDs      = setdiff(controlIDs, excludedIDs); 
 
 % aggregate and run statistics on difference
@@ -33,54 +32,14 @@ missedControls  = [];
 ERSPp           = {};
 ERSPc           = {};
  
-cfg = [];
-
 for Pi = patientIDs
     try
-        ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);
-        trialInfo       = util_WM_tInfo(trialType, ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\BEH_output\sub-' num2str(Pi) '_beh_trials.mat']); 
+        ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);
        
         fn              = fieldnames(ERSPvar);
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
-        outInds         = util_WM_IQR(mean(ERSP.powspctrm, [2,3,4], 'omitnan')); % reject outlier trials using IQR method
-        outVec          = find(outInds);
-        ERSPClean       = ERSP; 
-        ERSPClean.powspctrm(outVec,:,:,:) = [];
-        
-%         if numel(outVec) ~= 0
-%             disp(['Removed ' num2str(numel(outVec)) ' outliers for participant ' num2str(Pi)])
-% 
-%             figure; 
-%             cfg             = [];
-%             cfg.colorbar    = 'yes';  % Display colorbar
-%             cfg.zlim        = [0,2.5];
-%             cfg.xlim        = [-0.5,3];
-%             cfg.figure      = 'gcf';
-%             set(gcf,'Position',[100 100 1500 500])
-%             
-%             subplot(1,2,1); 
-%             ft_singleplotTFR(cfg, ERSP);
-%             title (['Participant ' num2str(Pi) ' before outlier removal'])
-%             
-%             subplot(1,2,2);
-%             ft_singleplotTFR(cfg, ERSPClean);
-%             title(['After outlier removal (N = ' num2str(numel(outVec)) ')'])
-%      
-% %             for Oi = 1:numel(outVec)
-% %                 disp(['Trial ' num2str(outVec(Oi)) ' rejected'])                
-% %                 
-% %                 figure; 
-% %                 cfg.trials       = outVec(Oi); 
-% %                 cfg.figure       = 'gcf'; 
-% %                 ft_singleplotTFR(cfg, ERSP);
-% %                 title('Outlier ERSP', 'FontSize', 15)
-% %                 
-% %             end
-% 
-%         end
-        
-        ERSPp{end+1}    = squeeze(mean(ERSPClean.powspctrm,[1,2],'omitnan'));
+        ERSPp{end+1}    = squeeze(mean(ERSP.powspctrm,[1,2],'omitnan'));
         
     catch
         missedPatients(end+1) = Pi;
@@ -90,37 +49,11 @@ end
 for Pi = controlIDs 
     try
         
-        ERSPvar =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);
+        ERSPvar =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);
         fn              = fieldnames(ERSPvar);
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
-        outInds         = util_WM_IQR(mean(ERSP.powspctrm, [2,3,4], 'omitnan')); % reject outlier trials using IQR method
-        outVec          = find(outInds);
-        ERSPClean       = ERSP; 
-        ERSPClean.powspctrm(outVec,:,:,:) = [];
-        
-%         if numel(outVec) ~= 0
-%             disp(['Removed ' num2str(numel(outVec)) ' outliers for participant ' num2str(Pi)])
-% 
-%             figure; 
-%             cfg             = [];
-%             cfg.colorbar    = 'yes';  % Display colorbar
-%             cfg.zlim        = [0,2.5];
-%             cfg.xlim        = [-0.5,3];
-%             cfg.figure      = 'gcf';
-%             set(gcf,'Position',[100 100 1500 500])
-%             
-%             subplot(1,2,1); 
-%             ft_singleplotTFR(cfg, ERSP);
-%             title (['Participant ' num2str(Pi) ' before outlier removal'])
-%             
-%             subplot(1,2,2);
-%             ft_singleplotTFR(cfg, ERSPClean);
-%             title(['After outlier removal (N = ' num2str(numel(outVec)) ')'])
-% 
-%         end
-        
-        ERSPc{end+1}    = squeeze(mean(ERSPClean.powspctrm,[1,2], 'omitnan'));
+        ERSPc{end+1}    = squeeze(mean(ERSP.powspctrm,[1,2], 'omitnan'));
         
     catch
        missedControls(end+1) = Pi; 
@@ -132,11 +65,41 @@ pMat    = cat(3,ERSPp{:});
 cMat    = cat(3,ERSPc{1:numel(ERSPc)});
 
 
-% participants versus controls contrast
+% Participants versus controls contrast
+%--------------------------------------------------------------------------
+
 [clusters, p_values, t_sums, permutation_distribution] = permutest(pMat,cMat, false, pThreshold, nPermutations, true);
 
 util_WM_plot_ERSP(ERSPp, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_' trialSection '.png'], [])
 util_WM_plot_ERSP(ERSPc, timePoints, freqPoints, ['ERSP_CTRL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_ctrl_' trialType '_' channelGroup.key '_' trialSection '.png'], [])
+
+
+% Baseline versus navigation spectra 
+%--------------------------------------------------------------------------
+
+figure; 
+plot()
+pMat
+
+
+
+% Band power 
+%--------------------------------------------------------------------------
+
+
+
+
+% Regresssion 
+%--------------------------------------------------------------------------
+
+
+
+% Save and summarize results 
+%--------------------------------------------------------------------------
+
+
+
+
 
 % Attempted use of fieldtrip built-in statistics - not working due to
 % imbalanced design 

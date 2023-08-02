@@ -44,35 +44,50 @@ for Pi = allParticipants
  
 end
 
-%% Aggregate ERSP results
-%--------------------------------------------------------------------------
-trialTypes = {'learn', 'probe'}; 
 
-for Ti = 1:2
+%% Aggregate temporal ERSP results
+%--------------------------------------------------------------------------
+sessionTypes        = {'stat', 'mobi'}; 
+trialTypes          = {'learn', 'probe'}; 
+windowTypes         = {'Start', 'End'}; 
+
+for Gi = 1%:numel(config_param.chanGroups)
+    for Si = 1:2
+        
+        WM_stat_outlier_removal(sessionTypes{Si}, config_param.chanGroups(Gi));
+        
+        for Wi = 1:2
+            for Ti = 1:2
+                
+                condType = [trialTypes{Ti} '_' sessionTypes{Si}];
+                  
+                [pval] = WM_stat_ERSP(condType, windowTypes{Wi}, config_param.chanGroups(Gi));
+                disp([config_param.chanGroups(Gi).key, ', ' condType ' ' windowTypes{Wi} ', p = ' num2str(pval(1))])
+                
+            end
+        end
+    end
+end
+
+%--------------------------------------------------------------------------
+trialTypes = {'stat_learn', 'mobi_learn', 'stat_probe', 'mobi_probe'}; 
+
+for Ti = 1:4
     
     trialType = trialTypes{Ti}; 
-    statArray = {};
-    for Gi = 1:numel(config_param.chanGroups)
+    
+    for Gi = 1%:numel(config_param.chanGroups)
         
-        disp([config_param.chanGroups(Gi).key, ', ' trialType])
-        [pMTL, pCTRL, statStruct, missingParticipants] = WM_stat_ERSP(trialType, 'start', config_param.chanGroups(Gi));
-        
-        statArray{end+1} = statStruct;
-        
-        for pInd = 1:numel(pMTL)
-            disp(['MTL cluster p = ' num2str(pMTL(pInd)) ' for ' config_param.chanGroups(Gi).key])
-        end
-        
-        for pInd = 1:numel(pCTRL)
-            disp(['CTRL cluster p = ' num2str(pCTRL(pInd)) ' for ' config_param.chanGroups(Gi).key])
-        end
+        WM_stat_spatial_ERSP(trialType, config_param.chanGroups(Gi), '8to12_Hz');
         
     end
     
-    save(fullfile(config_folder.results_folder, config_folder.ersp_folder, ['stats_' trialType '.mat']), 'statArray');
+    %save(fullfile(config_folder.results_folder, config_folder.ersp_folder, ['stats_' trialType '.mat']), 'statArray');
 end
 
-for Ti = 1:2
+%% Aggregate spatial ERSP results
+%--------------------------------------------------------------------------
+for Ti = 1:4
     
     trialType = trialTypes{Ti};
     statArray = {};
