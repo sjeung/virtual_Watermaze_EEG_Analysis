@@ -33,7 +33,7 @@ config_folder.beh_folder            = 'BEH_output';
     config_folder.behFileName       = '_beh_trials.mat'; 
     config_folder.behStructFileName     = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat'; % this is the og output from beh anaylsis
 config_folder.spatial_power_folder  = 'spatial_power'; 
-   
+config_folder.pruned_ERSP_folder    = 'ERSP_pruned'; 
 
 %% Parameters 
 % IC cleaning 
@@ -43,8 +43,8 @@ config_param.IC_threshold    = 0.8;
 % Beamforming 
 %--------------------------------------------------------------------------
 config_param.ROI_names       = {'RSC', 'Prefrontal_cortex'};
-config_param.FOI_lower       = [5,  8,  14, 30, 60];
-config_param.FOI_upper       = [8,  14, 30, 60, 120]; 
+config_param.FOI_lower       = [4,  8,  12, 30];
+config_param.FOI_upper       = [8,  12, 30, 60]; 
 
 % Behavioral anaylsis 
 %--------------------------------------------------------------------------
@@ -52,7 +52,12 @@ config_param.memscore_iterations = [];
 
 % ERSP analysis
 %--------------------------------------------------------------------------
-config_param.ERSP_freq_range = [3,20];
+config_param.ERSP_freq_range = [3,60];
+
+% Band definition 
+%--------------------------------------------------------------------------
+config_param.band_names     = {'theta', 'alpha', 'beta', 'gamma'};  
+config_param.band_bounds    = [4,8;  8,12;  12,30;  30,60];         % a vector of 2 X number of fBands; 
 
 load('ExampleChanLoc.mat', 'exampleChanLoc'); % only load to match channel names with channel indices
 chanLabels                  = {exampleChanLoc.labels}; 
