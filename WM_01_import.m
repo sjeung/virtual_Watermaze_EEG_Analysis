@@ -21,7 +21,7 @@ WM_config
 
 % data directory
 addpath(fullfile(config_folder.data_folder, 'source-data'))
-numericalIDs                        = [81001]; % go over all participants
+numericalIDs                        = [82010, 82011, 83001:83011]; % go over all participants
 
 
 % import issues
