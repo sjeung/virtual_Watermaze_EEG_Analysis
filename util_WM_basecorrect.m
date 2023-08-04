@@ -31,7 +31,7 @@ if ~isfolder(erspFileDir)
     mkdir(erspFileDir)
 end
 
-save(fullfile(erspFileDir, erspFileName), 'ERSPcorr'); 
+save(fullfile(erspFileDir, erspFileName), 'ERSPcorr',  '-v7.3'); 
 
 % plot the ERSP using FieldTrip functions
 f = figure;
