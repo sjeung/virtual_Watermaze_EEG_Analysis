@@ -49,13 +49,13 @@ for Pi = participantIDs
         meansPS         = mean(ERSPPS.powspctrm, [2,3,4], 'omitnan');
         meansPE         = mean(ERSPPE.powspctrm, [2,3,4], 'omitnan');
         
+        
         matchVec        = [ones(1,numel(meansLS)),   ones(1,numel(meansLE))*2,  ones(1,numel(meansPS))*3,  ones(1,numel(meansPE))*4; ...
                            1:numel(meansLS),         1:numel(meansLE),        1:numel(meansPS),        1:numel(meansPE)]';  
         
         % concatenate learn and probe trials so that outlier removal can be performed over all trials in one session (stat or desktop)
         outInds         = util_WM_IQR([meansLS; meansLE; meansPS; meansPE;]); % reject outlier trials using IQR method
         
-
         % remvoe outliers from ERSP fields
         ERSPLS.powspctrm(matchVec(outInds == 1 & matchVec(:,1) == 1,2),:,:,:) = [];
         ERSPLE.powspctrm(matchVec(outInds == 1 & matchVec(:,1) == 2,2),:,:,:) = [];
@@ -87,22 +87,33 @@ for Pi = participantIDs
         % outlier summary file 
         save(fullfile(prunedFileDir, ['sub-' num2str(Pi) '_outliers_' sessionType '_' channelGroup.key '.mat']), 'outInds', 'matchVec')
       
-%         figure;
-%         cfg             = [];
-%         cfg.colorbar    = 'yes';  % Display colorbar
-%         cfg.zlim        = [0,2.5];
-%         cfg.xlim        = [-0.5,3];
-%         cfg.figure      = 'gcf';
-%         set(gcf,'Position',[100 100 1500 500])
-%         
-%         subplot(1,2,1);
-%         ft_singleplotTFR(cfg, ERSP);
-%         title (['Participant ' num2str(Pi) ' before outlier removal'])
-%         
-%         subplot(1,2,2);
-%         ft_singleplotTFR(cfg, ERSPClean);
-%         title(['After outlier removal (N = ' num2str(numel(outVec)) ')'])
-%         
+        f = figure;
+        cfg             = [];
+        cfg.colorbar    = 'yes';  % Display colorbar
+        cfg.zlim        = [0,2.5];
+        if strcmp(sessionType, 'mobi')
+            cfg.zlim        = [0,5];
+        end
+        cfg.xlim        = [-0.5,3];
+        cfg.figure      = 'gcf';
+        set(gcf,'Position',[100 100 1500 800])
+        
+        subplot(2,2,1);
+        ft_singleplotTFR(cfg, ERSPLS);
+        title('ERSPLS')
+        subplot(2,2,2);
+        ft_singleplotTFR(cfg, ERSPLE);
+        title('ERSPLE')
+        subplot(2,2,3);
+        ft_singleplotTFR(cfg, ERSPPS);
+        title('ERSPPS')
+        subplot(2,2,4);
+        ft_singleplotTFR(cfg, ERSPPE);
+        title('ERSPPE')
+        
+        saveas(f, fullfile(prunedFileDir, ['sub-' num2str(Pi) '_outliers_' sessionType '_' channelGroup.key '.png']))
+        close(f);
+        
 %         for Oi = 1:numel(outVec)
 %             disp(['Trial ' num2str(outVec(Oi)) ' rejected'])
 %             
