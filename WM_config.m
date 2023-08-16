@@ -34,6 +34,8 @@ config_folder.beh_folder            = 'BEH_output';
     config_folder.behStructFileName     = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat'; % this is the og output from beh anaylsis
 config_folder.spatial_power_folder  = 'spatial_power'; 
 config_folder.pruned_ERSP_folder    = 'ERSP_pruned'; 
+config_folder.band_powers_folder    = '';
+    config_folder.bandPowerFileName = '_band_powers.mat'; 
 
 %% Parameters 
 % IC cleaning 
@@ -104,10 +106,10 @@ config_param.chanGroups(4).chan_names    = {'g24','y20', 'r18', 'r20'};
 %     end
 % end
 
-for Gi = 1:numel(config_param.chanGroups)
+for CGi = 1:numel(config_param.chanGroups)
     
-    for Ni = 1:numel(config_param.chanGroups(Gi).chan_names)
-        config_param.chanGroups(Gi).chan_inds(Ni)   = find(strcmpi(chanLabels, config_param.chanGroups(Gi).chan_names{Ni}));
+    for Ni = 1:numel(config_param.chanGroups(CGi).chan_names)
+        config_param.chanGroups(CGi).chan_inds(Ni)   = find(strcmpi(chanLabels, config_param.chanGroups(CGi).chan_names{Ni}));
     end
     
 end
