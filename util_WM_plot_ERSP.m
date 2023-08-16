@@ -1,58 +1,71 @@
-function util_WM_plot_ERSP(ERSPAll, times, freqs, figTitle, figFullpath, mask)
+function util_WM_plot_ERSP(ERSPAll, times, freqs, figTitle, figFullpath, mask, lims)
 
-
-for Ei = 1:numel(ERSPAll)
-    if Ei == 1
-        ERSPMean = ERSPAll{1};
-    else
-        ERSPMean = ERSPMean + ERSPAll{Ei};
+if iscell(ERSPAll{1}) && numel(ERSPAll) == 2 
+    
+    ERSPp = ERSPAll{1}; ERSPc = ERSPAll{2}; 
+    ERSPMat    = NaN([size(ERSPp{1}),numel(ERSPp)]);
+    
+    for cellInd = 1:numel(ERSPp)
+        ERSPMat(:,:,cellInd) = ERSPp{cellInd};
     end
+    
+    ERSPMeanP    = median(ERSPp,3);
+    
+    ERSPMat    = NaN([size(ERSPc{1}),numel(ERSPc)]);
+    
+    for cellInd = 1:numel(ERSPc)
+        ERSPMat(:,:,cellInd) = ERSPc{cellInd};
+    end
+    
+    ERSPMeanC    = median(ERSPc,3);
+    ERSPMean    = ERSPMeanP - ERSPMeanC; 
+    clims       = [-0.2, 0.2]; 
+    
+else
+    
+    ERSPMat    = NaN([size(ERSPAll{1}),numel(ERSPAll)]);
+    
+    for cellInd = 1:numel(ERSPAll)
+       ERSPMat(:,:,cellInd) = ERSPAll{cellInd};
+    end
+    
+    ERSPMean    = median(ERSPMat,3);
+    clims       = lims;
+    
+end 
+
+
+
+if isempty(mask)
+    f = figure;
+    imagesclogy(times,...
+        freqs,...
+        ERSPMean);
+else
+    MaskedMean = ERSPMean;
+    allInds = 1:numel(MaskedMean);
+    restInds = setdiff(allInds, mask);
+    MaskedMean(restInds)    = 0;
+    
+    f = figure;
+    imagesclogy(times,...
+        freqs,...
+        MaskedMean);
 end
 
-ERSPMean = ERSPMean./numel(ERSPAll); 
-
-f = figure;
-imagesclogy(times,...
-    freqs,...
-    ERSPMean);%,...
 axis xy;
 ylabel('Frequency')
 xlabel('Time in sec')
 title(figTitle,'Interpreter', 'none')
 xline(0,'black');
 xticks([0, 1, 2, 3])
-colormap(gca, jet);
-colorbar; 
-caxis([0, 4]);
+colorbar;
+caxis(clims);
 
 if ~isfolder(fileparts(figFullpath))
     mkdir(fileparts(figFullpath))
 end
 
 saveas(f, figFullpath)
-close(f);
-
-
-if ~isempty(mask)
-    MaskedMean = ERSPMean;
-    allInds = 1:numel(MaskedMean);
-    restInds = setdiff(allInds, mask{1});
-    MaskedMean(restInds)    = 0;
-    
-    f = figure;
-    imagesclogy(times,...
-        freqs,...
-        MaskedMean);%,...
-    axis xy;
-    ylabel('Frequency')
-    xlabel('Time in ms')
-    title(figTitle,'Interpreter', 'none')
-    xline(0,'black');
-    xticks([500, 1500, 2500])
-    caxis([-3, 3]);
-    colormap(gca, jet);% pink);
-    saveas(f, [figFullpath(1:end-4) '_mask.png'])
-    close(f);
-end
 
 end
