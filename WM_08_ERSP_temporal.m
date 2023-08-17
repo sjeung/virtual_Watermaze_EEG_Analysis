@@ -29,10 +29,10 @@ ERSPProbeS = ERSPProbeS.ERSPcorr;
 ERSPProbeM = ERSPProbeM.ERSPcorr; 
 
 %% Analysis of the start and end of trials
-util_WM_cut_windows(ERSPLearnS, 4, Pi, ['learn_stat_' elecGroup.key]);
-util_WM_cut_windows(ERSPLearnM, 4, Pi, ['learn_mobi_' elecGroup.key]);
-util_WM_cut_windows(ERSPProbeS, 4, Pi, ['probe_stat_' elecGroup.key]);
-util_WM_cut_windows(ERSPProbeM, 4, Pi, ['probe_mobi_' elecGroup.key]);
+util_WM_cut_windows(ERSPLearnS, 3, Pi, ['learn_stat_' elecGroup.key]);
+util_WM_cut_windows(ERSPLearnM, 3, Pi, ['learn_mobi_' elecGroup.key]);
+util_WM_cut_windows(ERSPProbeS, 3, Pi, ['probe_stat_' elecGroup.key]);
+util_WM_cut_windows(ERSPProbeM, 3, Pi, ['probe_mobi_' elecGroup.key]);
 
 
 end
