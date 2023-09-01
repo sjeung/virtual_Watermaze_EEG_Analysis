@@ -11,11 +11,11 @@ eeglab; % start eeglab to add bemobil pipeline to matlab path
 rmpath(fileparts(which('ft_defaults'))) % remove the fieldtrip version that is in the pipeline
 addpath('C:\Users\seinjeung\Documents\GitHub\fieldtrip') % add the modded fieldtrip
 
-% check streams 
-addpath('C:\Users\seinjeung\Documents\GitHub\fieldtrip\external\xdf')
-streams = load_xdf('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\source-data\81001\81001_VR.xdf'); 
-cellfun(@(x) x.info.name,streams,'UniformOutput', false)
-%cellfun(@(x) x.label, motionStream.info.desc.channels.channel, 'UniformOutput', false)'
+% % check streams 
+% addpath('C:\Users\seinjeung\Documents\GitHub\fieldtrip\external\xdf')
+% streams = load_xdf('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\source-data\81001\81001_VR.xdf'); 
+% cellfun(@(x) x.info.name,streams,'UniformOutput', false)
+% %cellfun(@(x) x.label, motionStream.info.desc.channels.channel, 'UniformOutput', false)'
 
 WM_config
 
@@ -271,6 +271,6 @@ for subject = numericalIDs
     
    config.match_electrodes_channels     = matchlocs;
    config.other_data_types              = {'motion'};
-   bemobil_bids2set(config);
+   %bemobil_bids2set(config);
     
 end

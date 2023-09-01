@@ -21,7 +21,6 @@ EEGLAB
 FieldTrip  
 
 
-
 ## Authors (role assignments are tentative)
 Sein Jeung (TUB) collected the data, implemented the EEG analysis.    
 Deetje Iggena (CHARITE) collected the data, evaluated the analysis results.    
@@ -32,7 +31,6 @@ Christoph Ploner (CHARITE), Carsten Finke (CHARITE), Klaus Gramann (TUB) supervi
 ### Acknowledgements
 Tore Knabe implemented the virtual environment   
 Funding agencies etc?
-
 
 
 ## License

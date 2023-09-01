@@ -1,4 +1,4 @@
-function WM_stat_ERSP(trialType, trialSection, channelGroup)
+function WM_stat_ERSP(trialType, trialSection, channelGroup, doERSPStat)
 
 % trialType = 'learn_stat', 'learn_mobi', 'probe_stat', *probe_mobi'
 % contrast participants versus controls
@@ -14,7 +14,7 @@ nPermutations   = 2000;
 
 % Load data
 %--------------------------------------------------------------------------
-ERSPvar = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-81001\sub-81001_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);
+ERSPvar = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-81001\sub-81001_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);
 fn = fieldnames(ERSPvar); vn = fn{1}; ERSP = ERSPvar.(vn); % highly annoying to work with this variable name - update later
 
 timePoints = ERSP.time; 
@@ -29,6 +29,7 @@ excludedIDs     = [81005, 82005, 83005 ...      % 81005 and matched controls exc
                    81008, 82008, 83008 ...      % 81008 and matched controls excluded due to extensive spectral artefacts in data
                    82009 ];                     % 82009 nausea   patientIDs      = setdiff(patientIDs, excludedIDs); 
 controlIDs      = setdiff(controlIDs, excludedIDs); 
+patientIDs      = setdiff(patientIDs, excludedIDs); 
 
 % aggregate and run statistics on difference
 missedPatients  = []; 
@@ -40,7 +41,7 @@ bandpowersc     = [];
     
 for Pi = patientIDs
     try
-        ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);    
+        ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);    
         fn              = fieldnames(ERSPvar);
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
@@ -73,7 +74,7 @@ end
 for Pi = controlIDs 
     try
         
-        ERSPvar =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);
+        ERSPvar =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);
         fn              = fieldnames(ERSPvar);
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
@@ -108,32 +109,34 @@ cMat    = cat(3,ERSPc{1:numel(ERSPc)});
 
 % Participants versus controls contrast
 %--------------------------------------------------------------------------
-[clusters, p_values, t_sums, permutation_distribution] = permutest(pMat,cMat, false, pThreshold, nPermutations, true);
-
-if contains(trialType, 'mobi')
-    lims = [0,7]; 
-else  
-    lims = [0,2]; 
-end
-
-util_WM_plot_ERSP(ERSPp, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
-util_WM_plot_ERSP(ERSPc, timePoints, freqPoints, ['ERSP_CTRL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_ctrl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
-
-sigClusters = find(p_values < 0.05); 
-
-for Ci = sigClusters 
+if doERSPStat
+    [clusters, p_values, t_sums, permutation_distribution] = permutest(pMat,cMat, false, pThreshold, nPermutations, true);
     
-    disp([ num2str(Ci) ' out of ' num2str(numel(sigClusters)) ' significant cluster found'])
-    mask = clusters{Ci}; 
-    util_WM_plot_ERSP({ERSPp, ERSPc}, timePoints, freqPoints, ['MTLR-CTRL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_diff_' trialType '_' channelGroup.key '_' trialSection '.png'], mask, lims)
+    if contains(trialType, 'mobi')
+        lims = [0,4];
+    else
+        lims = [0,1.2];
+    end
     
+    util_WM_plot_ERSP(ERSPp, timePoints, freqPoints, ['ERSP_MTL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
+    util_WM_plot_ERSP(ERSPc, timePoints, freqPoints, ['ERSP_CTRL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\aggregated_ERSP_ctrl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
+    
+    sigClusters = find(p_values < 0.05);
+    
+    for Ci = sigClusters
+        
+        disp([num2str(Ci) ' out of ' num2str(numel(sigClusters)) ' significant cluster found'])
+        mask = clusters{Ci};
+        util_WM_plot_ERSP({ERSPp, ERSPc}, timePoints, freqPoints, ['MTLR-CTRL_' channelGroup.key], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\aggregated_ERSP_diff_' trialType '_' channelGroup.key '_' trialSection '.png'], mask, lims)
+        
+    end
+    
+    disp(['ERSP sig cluster p = ' num2str(p_values(1))])
 end
-
-disp(['ERSP sig cluster p = ' num2str(p_values(1))])
 
 % Participant versus control spectra 
 %--------------------------------------------------------------------------
-figure; 
+f = figure; 
 subplot(1,2,1)
 this = median(pMat, [2,3]); this = squeeze(this);
 plot(this, 'b', 'LineWidth', 2);
@@ -173,9 +176,28 @@ end
 xticks([1,2,3,4])
 xticklabels({'theta','alpha','beta','gamma'})
 set(gcf,'Position',[300 300 1500 800])
+saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '.png']))
 
 for Bi = 1:numel(config_param.band_names)
     [~, pval] = ttest2(bandpowersp(:,Bi), bandpowersc(:,Bi)); 
     disp([config_param.band_names{Bi} ', ' trialType ', ' trialSection ', ' channelGroup.key ' band powers, p = ' num2str(pval)])
 end
+
+% Temporal band power  
+%--------------------------------------------------------------------------
+for Bi = 1:numel(config_param.band_names)
+    
+    
+end
+
+
+
+
+
+
+
+
+
+
+
 end

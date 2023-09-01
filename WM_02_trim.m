@@ -9,7 +9,6 @@ WM_config;
 [trimmedEEGFileName, trimmedEEGFileDir] = assemble_file(config_folder.data_folder, config_folder.trimmed_folder, config_folder.trimmedFileNameEEG, Pi); 
 [trimmedMOTIONFileName, trimmedMOTIONFileDir] = assemble_file(config_folder.data_folder, config_folder.trimmed_folder, config_folder.trimmedFileNameMotion, Pi); 
 
-
 rawEEG      = pop_loadset(fullfile(rawEEGFileDir, rawEEGFileName));
 rawMOTION   = pop_loadset(fullfile(rawMOTIONFileDir, rawMOTIONFileName));
 

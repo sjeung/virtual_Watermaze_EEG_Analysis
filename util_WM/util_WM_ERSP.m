@@ -23,15 +23,15 @@ ERSP                    = ft_freqanalysis(cfg, EEG);
 
 
 % % plot the ERSP using FieldTrip functions
-% f = figure;
-% cfg             = [];
-% cfg.colorbar    = 'yes';  % Display colorbar
-% cfg.zlim        = [0,4];
-% cfg.figure      = 'gcf';
-% set(gcf,'Position',[100 100 2500 500])
-% 
-% hold on; 
-% cfg.xlim        = [-0.5,3];
-% ft_singleplotTFR(cfg, ERSP);
-% title('Uncorrected ERSP', 'FontSize', 15)
+f = figure;
+cfg             = [];
+cfg.colorbar    = 'yes';  % Display colorbar
+cfg.zlim        = [0,4];
+cfg.figure      = 'gcf';
+set(gcf,'Position',[100 100 2500 500])
+
+hold on; 
+cfg.xlim        = [-0.5,3];
+ft_singleplotTFR(cfg, ERSP);
+title('Uncorrected ERSP', 'FontSize', 15)
 end
