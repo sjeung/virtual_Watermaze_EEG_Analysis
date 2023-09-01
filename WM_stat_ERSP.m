@@ -56,8 +56,15 @@ for Pi = patientIDs
             % find indices of closed point to upper and lower bounds
             [~,lowInd]                  = min(abs(freqPoints - config_param.band_bounds(Bi,1)));
             [~,upInd]                   = min(abs(freqPoints - config_param.band_bounds(Bi,2)));
-            bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,:),[2,3,4]);
-            meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(:,:,lowInd:upInd,:),[1,2,3,4])); 
+            
+            if strcmp(trialSection, 'Start')
+                timeInds = find(ERSP.time > 0);
+            elseif strcmp(trialSection, 'End')
+                timeInds = find(ERSP.time < 0);
+            end
+            
+            bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[2,3,4]);
+            meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[1,2,3,4]));
             
         end
         
@@ -89,7 +96,14 @@ for Pi = controlIDs
             % find indices of closed point to upper and lower bounds
             [~,lowInd]                  = min(abs(freqPoints - config_param.band_bounds(Bi,1)));
             [~,upInd]                   = min(abs(freqPoints - config_param.band_bounds(Bi,2)));
-            bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,:),[2,3,4]);
+            
+            if strcmp(trialSection, 'Start')
+                timeInds = find(ERSP.time > 0);
+            elseif strcmp(trialSection, 'End')
+                timeInds = find(ERSP.time < 0);
+            end
+            
+            bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[2,3,4]);
             meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(:,:,lowInd:upInd,:),[1,2,3,4]));
             
         end
