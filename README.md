@@ -11,11 +11,20 @@ performing a human-scale variant of the Morris Water Maze task. Two matched cont
 ## How to use the scripts
 Data directory is to be configured in ... WM_EEG_main.m calls other scripts ... (Work in progress) 
 
-### Data set  
+## Notes on data set   
+82002 : run index issues  
+82009 : excluded due to nausea  
+82010 : first half of desktop session (desktop_B_rec1.xdf) misses HMD stream  
+	fixed by replacing it with dummy stream in import  
+83004 : broken recordings  
+81005/82005/83005 : excluded due to development of symptoms that meet exclusion critera in the patient  
+81008/82008/83008 : excluded due to bad data quality (strong spectral artefacts) in the patient  
+
+### Availability
 
 Intend to upload on OSF or OpenNeuro (to be determined).  
 
-### Dependencies  
+## Dependencies  
 Matlab   
 EEGLAB  
 FieldTrip  
