@@ -25,12 +25,10 @@ numericalIDs                        = [82010, 82011, 83001:83011]; % go over all
 
 
 % import issues
-% 82002 : run index issue
-% 82009 : excluded due to nausea, missing motion stream in VR
-% 82010 : desktop session issue (no motion stream found?)
-% 83004 : broken recording 
-% 83006 : eloc file name issue suspected - solved
-% 84009 : eloc file name issue, forgot to import - solved
+% 82002 : run index issue (solved)
+% 82009 : excluded due to nausea, missing motion stream in VR (excluded)
+% 82010 : desktop session issue. No motion data in first desktop file - replaced with dummy torso stream (fixing...)
+% 83004 : broken recording (fixing...)
 
 
 % general metadata shared across all modalities
