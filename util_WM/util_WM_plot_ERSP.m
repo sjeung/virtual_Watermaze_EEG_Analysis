@@ -9,7 +9,7 @@ if iscell(ERSPAll{1}) && numel(ERSPAll) == 2
         ERSPMat(:,:,cellInd) = ERSPp{cellInd};
     end
     
-    ERSPMeanP    = mean(ERSPMat,3,'omitnan');
+    ERSPMeanP    = median(ERSPMat,3,'omitnan');
     
     ERSPMat    = NaN([size(ERSPc{1}),numel(ERSPc)]);
     
@@ -17,7 +17,7 @@ if iscell(ERSPAll{1}) && numel(ERSPAll) == 2
         ERSPMat(:,:,cellInd) = ERSPc{cellInd};
     end
     
-    ERSPMeanC    = mean(ERSPMat,3,'omitnan');
+    ERSPMeanC    = median(ERSPMat,3,'omitnan');
     ERSPMean    = ERSPMeanP - ERSPMeanC; 
     clims       = [-0.2, 0.2]; 
     
@@ -29,7 +29,7 @@ else
        ERSPMat(:,:,cellInd) = ERSPAll{cellInd};
     end
     
-    ERSPMean    = mean(ERSPMat,3,'omitnan');
+    ERSPMean    = median(ERSPMat,3,'omitnan');
     clims       = lims;
     
 end 
