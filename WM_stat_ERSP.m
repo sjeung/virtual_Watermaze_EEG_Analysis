@@ -61,6 +61,8 @@ for Pi = patientIDs
                 timeInds = find(ERSP.time > 0);
             elseif strcmp(trialSection, 'End')
                 timeInds = find(ERSP.time < 0);
+            elseif strcmp(trialSection, 'Mid')
+                timeInds = find(ERSP.time);
             end
             
             bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[2,3,4]);
@@ -101,6 +103,8 @@ for Pi = controlIDs
                 timeInds = find(ERSP.time > 0);
             elseif strcmp(trialSection, 'End')
                 timeInds = find(ERSP.time < 0);
+            elseif strcmp(trialSection, 'Mid')
+                timeInds = find(ERSP.time);
             end
             
             bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[2,3,4]);
@@ -148,16 +152,27 @@ if doERSPStat
     disp(['ERSP sig cluster p = ' num2str(p_values(1))])
 end
 
+pColor = [22, 137, 128]/225; 
+cColor = [100, 100, 100]/225; 
 % Participant versus control spectra 
 %--------------------------------------------------------------------------
 f = figure; 
 subplot(1,2,1)
-this = median(pMat, [2,3]); this = squeeze(this);
-plot(this, 'b', 'LineWidth', 2);
+this = median(pMat, 2); this = squeeze(this);
+this2 = median(pMat, [2,3]); this2 = squeeze(this2);
+plot(this, 'LineWidth', 1, 'Color', [pColor, 0.5]);
 hold on; 
-that = median(cMat, [2,3]); that = squeeze(that);
-plot(that, 'k', 'LineWidth', 2)
-legend('mtl', 'ctrl')
+plot(this2, 'LineWidth', 3, 'Color', pColor);
+
+that = median(cMat, 2); that = squeeze(that);
+that2 = median(cMat, [2,3]); that2 = squeeze(that2);
+plot(that, 'LineWidth', 1, 'Color', [cColor, 0.5])
+plot(that2, 'LineWidth', 3, 'Color', cColor);
+
+% SEM = std(that,0,2)/sqrt(size(that,2)); % standard error
+% ts = tinv([0.025  0.975],length(that)-1); % t score
+% confplot(1:size(that,1), that2, median(that,2) - ts(2)*SEM, median(that,2) + ts(2)*SEM, 'Color', [pColor, 0.5] ); 
+
 xticks(1:5:size(cMat,1))
 xticklabelsCell = arrayfun(@num2str, round(freqPoints(1:5:size(cMat,1))), 'UniformOutput', false);
 xticklabels(xticklabelsCell);
@@ -178,9 +193,9 @@ h =  findobj(gca,'Tag','Box');
 for j=1:length(h)
 
     if mod(j,2) == 1
-        color = [.5, .5, .5];
+        color = cColor;
     else
-        color = 'b';
+        color = pColor;
     end
     
     patch(get(h(j),'XData'),get(h(j),'YData'),color,'FaceAlpha',.3, 'EdgeColor','w');

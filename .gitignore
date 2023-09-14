@@ -3,3 +3,7 @@
 *.png
 *.fig
 *.db
+*.jpg
+util_WM/license.txt
+util_WM/confplot.m
+util_WM/confidence_plot_test.m
