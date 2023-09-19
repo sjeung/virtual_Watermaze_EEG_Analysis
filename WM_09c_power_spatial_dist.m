@@ -106,11 +106,9 @@ end
 
 % visualize distance ERSP
 f1 = figure; 
-set(gcf,'Position',[100 100 2500 500])
 yticklabels     = fliplr(round(min(ERSP.freq)):4:round(max(ERSP.freq))); 
 yticks          = linspace(1, size(cdMat, 1), numel(yticklabels));
 
-subplot(1,2,1)
 imagesc(flipud(cdMat), [0,cLimUpper]); hold on; colorbar; 
 title([num2str(Pi) ', Center distance, ' condText], 'Interpreter', 'none')
 xticklabels = 0:4; 
