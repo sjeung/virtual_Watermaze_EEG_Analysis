@@ -15,7 +15,6 @@ WM_config;                                                                  % lo
 freqRange                   = config_param.ERSP_freq_range; 
 
 %% Time-frequency analysis of entire trials 
-
 [ERSPLearnSRaw] = util_WM_ERSP(elecGroup.chan_names, 'learn', 'stat', Pi, freqRange);
 [ERSPLearnMRaw] = util_WM_ERSP(elecGroup.chan_names, 'learn', 'mobi', Pi, freqRange);
 [ERSPProbeSRaw] = util_WM_ERSP(elecGroup.chan_names, 'probe', 'stat', Pi, freqRange);
@@ -27,14 +26,20 @@ util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProb
 %% Baseline correction 
 
 % compute baseline 
-[ERSPBaseMOBI]   = util_WM_ERSP(elecGroup.chan_names, 'walk', 'stat', Pi, freqRange);
-[ERSPBaseSTAT]   = util_WM_ERSP(elecGroup.chan_names, 'walk', 'mobi', Pi, freqRange);
+[ERSPStandBaseMOBI]     = util_WM_ERSP(elecGroup.chan_names, 'stand', 'stat', Pi, freqRange);
+[ERSPStandBaseSTAT]     = util_WM_ERSP(elecGroup.chan_names, 'stand', 'mobi', Pi, freqRange);
+[ERSPWalkBaseMOBI]      = util_WM_ERSP(elecGroup.chan_names, 'walk', 'stat', Pi, freqRange);
+[ERSPWalkBaseSTAT]      = util_WM_ERSP(elecGroup.chan_names, 'walk', 'mobi', Pi, freqRange);
+
+% compare walking baseline activity against standing baseline
+util_WM_basecorrect(ERSPWalkBaseSTAT, ERSPStandBaseSTAT, Pi, ['walk_versus_stand_stat_', elecGroup.key]);
+util_WM_basecorrect(ERSPWalkBaseMOBI, ERSPStandBaseMOBI, Pi, ['walk_versus_stand_stat_', elecGroup.key]);
 
 % correct trial data using common baseline
-util_WM_basecorrect(ERSPLearnSRaw, ERSPBaseSTAT, Pi, ['learn_stat_', elecGroup.key]);
-util_WM_basecorrect(ERSPLearnMRaw, ERSPBaseMOBI, Pi, ['learn_mobi_', elecGroup.key]);
-util_WM_basecorrect(ERSPProbeSRaw, ERSPBaseSTAT, Pi, ['probe_stat_', elecGroup.key]);
-util_WM_basecorrect(ERSPProbeMRaw, ERSPBaseMOBI, Pi, ['probe_mobi_', elecGroup.key]);
+util_WM_basecorrect(ERSPLearnSRaw, ERSPWalkBaseSTAT, Pi, ['learn_stat_', elecGroup.key]);
+util_WM_basecorrect(ERSPLearnMRaw, ERSPWalkBaseMOBI, Pi, ['learn_mobi_', elecGroup.key]);
+util_WM_basecorrect(ERSPProbeSRaw, ERSPWalkBaseSTAT, Pi, ['probe_stat_', elecGroup.key]);
+util_WM_basecorrect(ERSPProbeMRaw, ERSPWalkBaseMOBI, Pi, ['probe_mobi_', elecGroup.key]);
 
 
 end
