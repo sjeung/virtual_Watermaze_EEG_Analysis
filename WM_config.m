@@ -32,10 +32,13 @@ config_folder.band_folder           = 'bandpower';
 config_folder.beh_folder            = 'BEH_output'; 
     config_folder.behFileName       = '_beh_trials.mat'; 
     config_folder.behStructFileName     = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat'; % this is the og output from beh anaylsis
-config_folder.spatial_power_folder  = 'spatial_power'; 
+config_folder.spatial_overlay_folder  = 'spatial_overlay'; 
+config_folder.spatial_overlay_target_folder  = 'spatial_overlay_target'; 
+config_folder.spatial_dist_folder   = 'spatial_dist'; 
 config_folder.pruned_ERSP_folder    = 'ERSP_pruned'; 
 config_folder.band_powers_folder    = '';
     config_folder.bandPowerFileName = '_band_powers.mat'; 
+
 
 %% Parameters 
 % IC cleaning 
