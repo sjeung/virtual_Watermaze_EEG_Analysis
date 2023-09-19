@@ -52,7 +52,12 @@ end
 
 % Sanity check : Do the numbers of indices match?
 if numel(blockStartIndices) ~= numBlocks
-    error('Invalid number of baseline tasks found')
+    if Pi == 83004
+        numBlocks = numel(blockStartIndices);
+        warning('Participant 83004 has only 10 blocks in data')
+    else
+        error('Invalid number of baseline tasks found')
+    end
 end
 
 
