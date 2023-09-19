@@ -33,7 +33,7 @@ util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProb
 
 % compare walking baseline activity against standing baseline
 util_WM_basecorrect(ERSPWalkBaseSTAT, ERSPStandBaseSTAT, Pi, ['walk_versus_stand_stat_', elecGroup.key]);
-util_WM_basecorrect(ERSPWalkBaseMOBI, ERSPStandBaseMOBI, Pi, ['walk_versus_stand_stat_', elecGroup.key]);
+util_WM_basecorrect(ERSPWalkBaseMOBI, ERSPStandBaseMOBI, Pi, ['walk_versus_stand_mobi_', elecGroup.key]);
 
 % correct trial data using common baseline
 util_WM_basecorrect(ERSPLearnSRaw, ERSPWalkBaseSTAT, Pi, ['learn_stat_', elecGroup.key]);
