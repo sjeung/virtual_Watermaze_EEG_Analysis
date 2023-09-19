@@ -47,10 +47,45 @@ MotionLearnM = MotionLearnM.ftMotion;
 MotionProbeS = MotionProbeS.ftMotion;
 MotionProbeM = MotionProbeM.ftMotion;
 
-fBand                   = [8,12]; 
-util_WM_ERSP_spatial_map(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, fBand, elecGroup.key)
-util_WM_ERSP_spatial_map(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, fBand, elecGroup.key)
-util_WM_ERSP_spatial_map(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, fBand, elecGroup.key)
-util_WM_ERSP_spatial_map(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, fBand, elecGroup.key)
+%--------------------------------------------------------------------------
+[~,overlayResultsDir]           = assemble_file(config_folder.results_folder, config_folder.spatial_overlay_folder, '', Pi);
+[~,overlayFigureDir]            = assemble_file(config_folder.figures_folder, config_folder.spatial_overlay_folder, '', Pi);
+[~,overlayTargetResultsDir]     = assemble_file(config_folder.results_folder, config_folder.spatial_overlay_target_folder, '', Pi);
+[~,overlayTargetFigureDir]      = assemble_file(config_folder.figures_folder, config_folder.spatial_overlay_target_folder, '', Pi);
+[~,distResultsDir]              = assemble_file(config_folder.results_folder, config_folder.spatial_dist_folder, '', Pi);
+[~,distFigureDir]               = assemble_file(config_folder.figures_folder, config_folder.spatial_dist_folder, '', Pi);
+
+if ~isfolder(overlayResultsDir);        mkdir(overlayResultsDir);       end
+if ~isfolder(overlayFigureDir);         mkdir(overlayFigureDir);        end
+if ~isfolder(overlayTargetResultsDir);  mkdir(overlayTargetResultsDir); end
+if ~isfolder(overlayTargetFigureDir);   mkdir(overlayTargetFigureDir);  end
+if ~isfolder(distResultsDir);           mkdir(distResultsDir);          end
+if ~isfolder(distFigureDir);            mkdir(distFigureDir);           end
+
+for Fi = 1:4
+    
+    fBand               = [config_param.FOI_lower(Fi), config_param.FOI_upper(Fi)];
+    
+    % a. overlay of power values onto space
+    WM_09a_power_spatial_overlay(ERSPLearnS, MotionLearnS, 'stat_learn', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+    WM_09a_power_spatial_overlay(ERSPLearnM, MotionLearnM, 'mobi_learn', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+    WM_09a_power_spatial_overlay(ERSPProbeS, MotionProbeS, 'stat_probe', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+    WM_09a_power_spatial_overlay(ERSPProbeM, MotionProbeM, 'mobi_probe', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+    
+    % b. overlay of power values onto space, centered around target
+    WM_09b_power_spatial_overlay_target(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+    WM_09b_power_spatial_overlay_target(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+    WM_09b_power_spatial_overlay_target(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+    WM_09b_power_spatial_overlay_target(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+    
+   
+end
+
+% c. power ordered by distacne to target/center
+WM_09c_power_spatial_dist(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, elecGroup.key, distResultsDir, distFigureDir)
+WM_09c_power_spatial_dist(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, elecGroup.key, distResultsDir, distFigureDir)
+WM_09c_power_spatial_dist(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
+WM_09c_power_spatial_dist(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
+
 
 end
