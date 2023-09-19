@@ -114,16 +114,6 @@ for Pi = participantIDs
         saveas(f, fullfile(prunedFileDir, ['sub-' num2str(Pi) '_outliers_' sessionType '_' channelGroup.key '.png']))
         close(f);
         
-%         for Oi = 1:numel(outVec)
-%             disp(['Trial ' num2str(outVec(Oi)) ' rejected'])
-%             
-%             figure;
-%             cfg.trials       = outVec(Oi);
-%             cfg.figure       = 'gcf';
-%             ft_singleplotTFR(cfg, ERSP);
-%             title('Outlier ERSP', 'FontSize', 15)
-%             
-%         end
         
     catch
         missedParticipants(end+1) = Pi;
