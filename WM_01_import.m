@@ -174,7 +174,7 @@ for subject = numericalIDs
     config.eeg.stream_name        = 'BrainVision';                          % required
     
     
-    for session = {'VR'} % , 'Desktop'}
+    for session = {'VR','Desktop'}
         
         if strcmp(session{1}, 'VR')
             config.motion.POS.unit                      = 'm';
@@ -269,6 +269,6 @@ for subject = numericalIDs
     
    config.match_electrodes_channels     = matchlocs;
    config.other_data_types              = {'motion'};
-   %bemobil_bids2set(config);
+   bemobil_bids2set(config);
     
 end
