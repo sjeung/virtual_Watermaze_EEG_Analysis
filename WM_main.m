@@ -52,16 +52,16 @@ end
 %--------------------------------------------------------------------------
 sessionTypes        = {'stat', 'mobi'};
 trialTypes          = {'learn', 'probe'};
-windowTypes         = {'Start', 'End'};
+windowTypes         = {'Start', 'End', 'Mid'};
 
-for Gi = 1
+for Gi = 1:2
     for Si = 1:2
+          
+        WM_stat_outlier_removal(sessionTypes{Si}, config_param.chanGroups(Gi));
         
-        %WM_stat_outlier_removal(sessionTypes{Si}, config_param.chanGroups(Gi));
-        
-        for Wi = 2
+        for Wi = 1:3 %1:2
             for Ti = 1:2
-                
+              
                 condType = [trialTypes{Ti} '_' sessionTypes{Si}];
                 
                 WM_stat_ERSP(condType, windowTypes{Wi}, config_param.chanGroups(Gi), true);
@@ -74,32 +74,17 @@ end
 %--------------------------------------------------------------------------
 trialTypes = {'stat_learn', 'mobi_learn', 'stat_probe', 'mobi_probe'}; 
 
-for Ti = 1:4
+for Ti = 3:4
     
     trialType = trialTypes{Ti}; 
     
     for Gi = 1%:numel(config_param.chanGroups)
-        
-        WM_stat_spatial_ERSP(trialType, config_param.chanGroups(Gi), '8to12_Hz');
-        
+        WM_stat_spatial_dist(trialType, config_param.chanGroups(Gi));
+        for Fi = [1,4]
+            %WM_stat_spatial_overlay(trialType, config_param.chanGroups(Gi), [num2str(config_param.FOI_lower(Fi)), 'to', num2str(config_param.FOI_upper(Fi)), '_Hz']);
+            WM_stat_spatial_overlay_target(trialType, config_param.chanGroups(Gi), [num2str(config_param.FOI_lower(Fi)), 'to', num2str(config_param.FOI_upper(Fi)), '_Hz']);
+        end
     end
     
     %save(fullfile(config_folder.results_folder, config_folder.ersp_folder, ['stats_' trialType '.mat']), 'statArray');
 end
-
-% %% Aggregate spatial ERSP results
-% %--------------------------------------------------------------------------
-% for Ti = 1:4
-%     
-%     trialType = trialTypes{Ti};
-%     statArray = {};
-%     
-%     for Gi = 1:numel(config_param.chanGroups)
-%         if Gi == 1
-%             WM_stat_bandpower(trialType, config_param.chanGroups(Gi), 1);
-%         else
-%             WM_stat_bandpower(trialType, config_param.chanGroups(Gi), 0);
-%         end
-%     end
-%     
-% end
