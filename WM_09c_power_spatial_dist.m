@@ -34,7 +34,8 @@ else
 end
 
 
-disp([motion.label{xChanInd}, ', ' motion.label{yChanInd}])
+disp(['Spatial overlay for ' num2str(Pi) ',' motion.label{xChanInd}, ', ' motion.label{yChanInd} ', ' condText])
+
 
 % create bins for targe/center distance plot
 tBinEdges   = 0:0.2:8;                                                      % target distance can go up to twice the radius

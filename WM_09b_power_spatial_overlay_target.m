@@ -32,7 +32,9 @@ else
     trialInds   = 1:numel(motion.trial); 
 end
 
-disp([motion.label{xChanInd}, ', ' motion.label{yChanInd}])
+
+disp(['Spatial overlay for ' num2str(Pi) ',' motion.label{xChanInd}, ', ' motion.label{yChanInd} ', ' condText])
+
 
 % extract frequency inds
 freqInds    = find(ERSP.freq >= fBand(1) & ERSP.freq <= fBand(2));
