@@ -41,7 +41,7 @@ bandpowersc     = [];
     
 for Pi = patientIDs
     try
-        ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);    
+        ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);    
         fn              = fieldnames(ERSPvar);
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
@@ -83,7 +83,7 @@ end
 for Pi = controlIDs 
     try
         
-        ERSPvar =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP.mat']);
+        ERSPvar =  load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);
         fn              = fieldnames(ERSPvar);
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
