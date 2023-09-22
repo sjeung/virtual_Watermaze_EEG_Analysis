@@ -47,6 +47,16 @@ for Pi = patientIDs
         ERSP            = ERSPvar.(vn);
         ERSPp{end+1}    = squeeze(median(ERSP.powspctrm,[1,2],'omitnan'));
         
+        % remove first learning trial
+        if contains(trialType, 'learn')
+            assert(size(ERSP.powspctrm,1) == 18);
+            triadsVec = 1:6;
+            trialInds = sort([triadsVec*3, triadsVec*3-1]);                         % this operation is performed in order to pick out first learn trials - beware it assumes all trials are present in data
+        else
+            assert(size(ERSP.powspctrm,1) == 24);
+            trialInds   = 1:numel(motion.trial);
+        end
+        
         % compute band power
         bandPowers      = []; % participant specific, trial-by-trial powers  
         meanBandPowers  = []; % trials are averaged
@@ -65,8 +75,8 @@ for Pi = patientIDs
                 timeInds = find(ERSP.time);
             end
             
-            bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[2,3,4]);
-            meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[1,2,3,4]));
+            bandPowers(:,end+1)         = median(ERSP.powspctrm(trialInds,:,lowInd:upInd,timeInds),[2,3,4]);
+            meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(trialInds,:,lowInd:upInd,timeInds),[1,2,3,4]));
             
         end
         
@@ -76,6 +86,7 @@ for Pi = patientIDs
         save(fullfile(bandFileDir, bandFileName), 'bandpowers')
 
     catch
+        warning(['Could not process participant ' num2str(Pi)])
         missedPatients(end+1) = Pi;
     end
 end
@@ -88,6 +99,16 @@ for Pi = controlIDs
         vn              = fn{1};
         ERSP            = ERSPvar.(vn);
         ERSPc{end+1}    = squeeze(median(ERSP.powspctrm,[1,2], 'omitnan'));
+        
+        % remove first learning trial
+        if contains(trialType, 'learn')
+            assert(size(ERSP.powspctrm,1) == 18);
+            triadsVec = 1:6;
+            trialInds = sort([triadsVec*3, triadsVec*3-1]);                         % this operation is performed in order to pick out first learn trials - beware it assumes all trials are present in data
+        else
+            assert(size(ERSP.powspctrm,1) == 24);
+            trialInds   = 1:numel(motion.trial);
+        end
         
         % compute band power
         bandPowers      = []; % participant specific, trial-by-trial powers
@@ -107,8 +128,8 @@ for Pi = controlIDs
                 timeInds = find(ERSP.time);
             end
             
-            bandPowers(:,end+1)         = median(ERSP.powspctrm(:,:,lowInd:upInd,timeInds),[2,3,4]);
-            meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(:,:,lowInd:upInd,:),[1,2,3,4]));
+            bandPowers(:,end+1)         = median(ERSP.powspctrm(trialInds,:,lowInd:upInd,timeInds),[2,3,4]);
+            meanBandPowers(Bi)          = squeeze(median(ERSP.powspctrm(trialInds,:,lowInd:upInd,:),[1,2,3,4]));
             
         end
         
@@ -118,6 +139,7 @@ for Pi = controlIDs
         save(fullfile(bandFileDir, bandFileName), 'bandpowers')
         
     catch
+       warning(['Could not process participant ' num2str(Pi)])  
        missedControls(end+1) = Pi; 
     end
 end
