@@ -67,10 +67,8 @@ end
 %% Aggregate baseline spectral analysis results
 %--------------------------------------------------------------------------
 for Gi = 1:2
-    for Si = 1:2
-        WM_stat_baseline(config_param.chanGroups(Gi), sessionTypes{Si}, 'stand');
-        WM_stat_baseline(config_param.chanGroups(Gi), sessionTypes{Si}, 'walk');
-    end
+    WM_stat_baseline(config_param.chanGroups(Gi), 'stand');
+    WM_stat_baseline(config_param.chanGroups(Gi), 'walk');
 end
 
 
