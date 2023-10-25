@@ -36,7 +36,7 @@ config_folder.spatial_overlay_folder  = 'spatial_overlay';
 config_folder.spatial_overlay_target_folder  = 'spatial_overlay_target'; 
 config_folder.spatial_dist_folder   = 'spatial_dist'; 
 config_folder.pruned_ERSP_folder    = 'ERSP_pruned'; 
-config_folder.band_powers_folder    = '';
+config_folder.band_powers_folder    = 'Band_powers';
     config_folder.bandPowerFileName = '_band_powers.mat'; 
 
 
@@ -118,6 +118,9 @@ for CGi = 1:numel(config_param.chanGroups)
 end
 
 
+%% Colors 
+config_visual.pColor = [8,97,89]/225; 
+config_visual.cColor = [120, 120, 120]/225; 
 
 
 

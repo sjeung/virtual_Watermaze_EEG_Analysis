@@ -24,7 +24,6 @@ freqRange                   = config_param.ERSP_freq_range;
 util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProbeMRaw, Pi); 
 
 %% Baseline correction 
-
 % compute baseline 
 [ERSPStandBaseMOBI]     = util_WM_ERSP(elecGroup.chan_names, 'stand', 'stat', Pi, freqRange);
 [ERSPStandBaseSTAT]     = util_WM_ERSP(elecGroup.chan_names, 'stand', 'mobi', Pi, freqRange);

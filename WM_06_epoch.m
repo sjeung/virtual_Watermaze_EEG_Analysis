@@ -118,7 +118,7 @@ for iSession    = 1:2
         
     end
     
-    %% Epoch trials (various lengths)
+    %% Epoch trials (variable lengths)
     for iType       = 1:numel(trialTypes)
         
         trialType   = trialTypes{iType};
