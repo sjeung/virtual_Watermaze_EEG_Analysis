@@ -201,5 +201,35 @@ end
 %         end
 %     end
 % end
+% colorbar; 
+% caxis([-0.2,0.2])
+% % Set the labels for rows (behavioral measures) and columns (EEG power bands)
+% rowLabels = {'MS', 'idPhi', 'DTW'}; % Replace with your labels
+% colLabels = {'theta', 'alpha', 'beta', 'gamma'}; % Replace with your labels
+% set(gca, 'YTick', 1:numel(rowLabels), 'YTickLabel', rowLabels);
+% set(gca, 'XTick', 1:numel(colLabels), 'XTickLabel', colLabels);
+% 
+% % Set the title and labels for the heatmap
+% title(['CTLR' ', ' trialType ', ' windowType, ', ' sessionType ', ' channelGroup.key]);
+% xlabel('EEG Power Bands');
+% ylabel('Behavioral Measures');
+% 
+% 
+% %--------------------------------------------------------------------------
+% for rowI = 1:3
+%     for colI = 1:4
+%         [~,pval] = ttest2(pSlopes(:,rowI,colI), cSlopes(:,rowI,colI));
+%         if pval < 0.05
+%             disp(['Diff' ', ' trialType ', ' windowType, ', ' sessionType ', ' channelGroup.key ', row ' num2str(rowI), ', col ' num2str(colI), 'p = ' num2str(pval)])
+%         end
+%     end
+% end
+% 
+% if ~isfolder(fullfile(config_folder.figures_folder, 'Correlation_matrices'))
+%     mkdir(fullfile(config_folder.figures_folder, 'Correlation_matrices'))
+% end
+% saveas(f,fullfile(config_folder.figures_folder, 'Correlation_matrices', [trialType '_' windowType, '_' sessionType '_' channelGroup.key '.png']))
+% close(f); 
+
 end
 

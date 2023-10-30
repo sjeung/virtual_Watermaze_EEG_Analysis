@@ -177,7 +177,7 @@ end
 % Participant versus control spectra 
 %--------------------------------------------------------------------------
 f = figure; 
-subplot(1,2,1)
+%subplot(1,2,1)
 this = mean(pMat, 2); pSpectra = squeeze(this);
 this2 = mean(pMat, [2,3]); pSpectraMean = squeeze(this2);
 that = mean(cMat, 2); cSpectra = squeeze(that);
@@ -206,60 +206,72 @@ fill(x, y_p, config_visual.pColor, 'FaceAlpha', 0.2, 'EdgeColor', 'none'); % Fil
 y_c = [mean_cSpectra + std_cSpectra, fliplr(mean_cSpectra - std_cSpectra)]; % y values for filling
 fill(x, y_c, config_visual.cColor, 'FaceAlpha', 0.2, 'EdgeColor', 'none'); % Fill confidence interval area for cSpectra
 
-grid on; 
-xticks(1:5:size(cMat,1))
-xticklabelsCell = arrayfun(@num2str, round(freqPoints(1:5:size(cMat,1))), 'UniformOutput', false);
+% %grid on; 
+
+%xlabel('frequencies in Hz')
+%ylabel('trial power / baseline')
+%title(['Power ratio ' trialType ', ' channelGroup.key ', ' trialSection], 'Interpreter', 'none')
+if contains(trialType, 'mobi')
+    ylim([0 20])
+else
+    ylim([-0.5 3])
+end
+
+set(gcf,'Position',[300 300 500 800])
+set(gca,'fontsize',20)
+set(gca,'Xscale','log')
+
+xticks([1 6 10 18 28 58])
+xticklabelsCell = arrayfun(@num2str, [3 8 12 20 30 60], 'UniformOutput', false);
 xticklabels(xticklabelsCell);
-xlabel('frequencies in Hz')
-ylabel('trial power / baseline')
-title(['Power ratio ' trialType ', ' channelGroup.key ', ' trialSection], 'Interpreter', 'none')
-if contains(trialType, 'mobi')
-    ylim([0 20])
-else
-    ylim([-0.5 3])
+
+if ~strcmp(trialSection,'Start')
+    set(gca, 'YColor','none')
 end
+saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '_narrow.png']))
+saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '_narrow.svg']))
 
-set(gca,'fontsize',15)
 
-% Band power 
-%--------------------------------------------------------------------------
-subplot(1,2,2) 
-dataBoxPlot                             = nan(numel(config_param.band_names),2,30);
-dataBoxPlot(:,1,1:size(bandpowersp,1))  = bandpowersp';
-dataBoxPlot(:,2,1:size(bandpowersc,1))  = bandpowersc';
-boxplot2(dataBoxPlot); 
-
-h =  findobj(gca,'Tag','Box');
-
-for j=1:length(h)
-
-    if mod(j,2) == 1
-        color = config_visual.cColor;
-    else
-        color = config_visual.pColor;
-    end
-    
-    patch(get(h(j),'XData'),get(h(j),'YData'),color,'FaceAlpha',.8, 'EdgeColor','w');
-    
-end
-
-xticks([1,2,3,4])
-xticklabels({'theta','alpha','beta','gamma'})
-set(gcf,'Position',[300 300 1500 800])
-set(gca,'fontsize',15)
-
-if contains(trialType, 'mobi')
-    ylim([0 20])
-else
-    ylim([-0.5 3])
-end
-
-saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '.png']))
-
-for Bi = 1:numel(config_param.band_names)
-    [~, pval] = ttest2(bandpowersp(:,Bi), bandpowersc(:,Bi)); 
-    disp([config_param.band_names{Bi} ', ' trialType ', ' trialSection ', ' channelGroup.key ' band powers, p = ' num2str(pval)])
-end
+ 
+% % Band power 
+% %--------------------------------------------------------------------------
+% subplot(1,2,2) 
+% dataBoxPlot                             = nan(numel(config_param.band_names),2,30);
+% dataBoxPlot(:,1,1:size(bandpowersp,1))  = bandpowersp';
+% dataBoxPlot(:,2,1:size(bandpowersc,1))  = bandpowersc';
+% boxplot2(dataBoxPlot); 
+% 
+% h =  findobj(gca,'Tag','Box');
+% 
+% for j=1:length(h)
+% 
+%     if mod(j,2) == 1
+%         color = config_visual.cColor;
+%     else
+%         color = config_visual.pColor;
+%     end
+%     
+%     patch(get(h(j),'XData'),get(h(j),'YData'),color,'FaceAlpha',.8, 'EdgeColor','w');
+%     
+% end
+% 
+% xticks([1,2,3,4])
+% xticklabels({'theta','alpha','beta','gamma'})
+% set(gcf,'Position',[300 300 1500 800])
+% set(gca,'fontsize',15)
+% 
+% if contains(trialType, 'mobi')
+%     ylim([0 20])
+% else
+%     ylim([-0.5 3])
+% end
+% 
+% saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '.png']))
+% 
+% for Bi = 1:numel(config_param.band_names)
+%     [~, pval] = ttest2(bandpowersp(:,Bi), bandpowersc(:,Bi)); 
+%     disp([config_param.band_names{Bi} ', ' trialType ', ' trialSection ', ' channelGroup.key ' band powers, p = ' num2str(pval)])
+% end
 
 
 end
