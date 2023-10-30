@@ -1,4 +1,13 @@
 function WM_stat_beh_eeg(sessionType, trialType, windowType, channelGroup)
+
+% EEG features 
+%   FM/PM theta, alpha, beta, gamma
+% Behavioral features
+%   Memory score
+%   idPhi
+%   DTW distances
+%--------------------------------------------------------------------------
+
 WM_config
 
 % session code (1 = desktop, 2 = VR)
@@ -18,86 +27,179 @@ controlIDs      = setdiff(controlIDs, excludedIDs);
 patientIDs      = setdiff(patientIDs, excludedIDs); 
 
 % patients
-[bandFileName, bandFileDir]     = assemble_file(config_folder.results_folder, config_folder.band_powers_folder, ['_' trialType '_' sessionType '_' windowType  '_' channelGroup.key '_' config_folder.bandPowerFileName], Pi);
-loadedVar                       = load(fullfile(bandFileDir, bandFileName), 'bandpowersp'); 
+loadedVar                       = load(fullfile(config_folder.results_folder, config_folder.band_powers_folder, ['MTLR_average_' trialType '_' sessionType '_' windowType  '_' channelGroup.key config_folder.bandPowerFileName])); % , 'bandpowersp'); 
 patientsPower                   = loadedVar.bandpowersp; 
 
 % controls 
-[bandFileName, bandFileDir]     = assemble_file(config_folder.results_folder, config_folder.band_powers_folder, ['_' trialType '_' sessionType '_' windowType  '_' channelGroup.key '_' config_folder.bandPowerFileName], Pi);
-loadedVar                       = load(fullfile(bandFileDir, bandFileName), 'bandpowersc');
+loadedVar                       = load(fullfile(config_folder.results_folder, config_folder.band_powers_folder, ['CTRL_average_' trialType '_' sessionType '_' windowType  '_' channelGroup.key config_folder.bandPowerFileName])); % , 'bandpowersp'); 
 controlsPower                   = loadedVar.bandpowersc; 
 
-% memory scores 
+% Behavioral measures 
 tableData   = readtable('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\BEHdata_OSF.xlsx'); 
 IDs         = tableData.id;
-MS          = tableData.memory_score;
 LP          = tableData.learning_or_probeTrial; 
-SU          = tableData.setup; 
+SU          = tableData.setup;
+MS          = tableData.memory_score;
+idPhis      = tableData.avg_idPhi_angular_velocity_5_sec; 
+DTWs        = tableData.learning_probe_avg_dTW_square; 
 
-pMeans = []; 
+pMeans      = []; 
+pSlopes     = NaN(numel(patientIDs), 3, 4); % number of participants X beh measures X frequency bands 
+pInd        = 1; 
 for Pi = patientIDs
-    tInds = find(IDs == Pi); 
-    pInds = find(LP == 2);
-    sInds = find(SU == sessionCode); 
-    this = MS(intersect(intersect(tInds,pInds),sInds));
-    pMeans(end+1) = mean(this); 
+    
+    % average performance per participant 
+    tInds               = find(IDs == Pi);          % participant ID 
+    pInds               = find(LP == 2);            % probe only
+    sInds               = find(SU == sessionCode);  % stat or mobi 
+    fullInds            = intersect(intersect(tInds,pInds),sInds); % trial inds without outlier removal
+    pMeans(1,end+1)     = mean(MS(fullInds)); 
+    pMeans(2,end)       = mean(idPhis(fullInds)); 
+    pMeans(3,end)       = mean(DTWs(fullInds)); 
+    
+    % correlate measures trial-by-trial 
+    [ERSPFileName, ERSPFileDir]    = assemble_file(config_folder.results_folder, 'ERSP_pruned', ['_' trialType '_' sessionType '_' channelGroup.key '_' windowType '_ERSP_pruned.mat'], Pi);
+    [bandFileName, bandFileDir]    = assemble_file(config_folder.results_folder, 'Band_powers', ['_' trialType '_' sessionType '_' windowType, '_' channelGroup.key '_band_powers.mat'], Pi);
+    ERSPFile    = load(fullfile(ERSPFileDir, ERSPFileName)); 
+    ERSPCell    = struct2cell(ERSPFile); ERSP = ERSPCell{1}; 
+    bandFile    = load(fullfile(bandFileDir, bandFileName)); 
+    bandPowers  = bandFile.trialBandPowers; 
+    behData     = [MS(fullInds), idPhis(fullInds), DTWs(fullInds)];
+    behData(ERSP.outliers,:) = [];% remove power outlier rows to match matrix size
+    
+    
+    try
+        [slopes]    = WM_correlate_EEG_beh(behData, bandPowers);
+        pSlopes(pInd,:,:)   = slopes;
+        pInd = pInd +1;
+    catch
+    end
+    
 end
 
-cMeans = []; 
+cMeans      = []; 
+cSlopes     = NaN(numel(controlIDs), 3, 4); % number of participants X beh measures X frequency bands 
+cInd        = 1; 
 for Pi = controlIDs
-    tInds = find(IDs == Pi);
-    pInds = find(LP == 2);
-    sInds = find(SU == sessionCode);
-    this = MS(intersect(intersect(tInds,pInds), sInds));
-    cMeans(end+1) = mean(this); 
+    
+    % average performance per participant 
+    tInds               = find(IDs == Pi);          % participant ID 
+    pInds               = find(LP == 2);            % probe only
+    sInds               = find(SU == sessionCode);  % stat or mobi 
+    fullInds            = intersect(intersect(tInds,pInds),sInds); % trial inds without outlier removal
+    cMeans(1,end+1)     = mean(MS(fullInds)); 
+    cMeans(2,end)       = mean(idPhis(fullInds)); 
+    cMeans(3,end)       = mean(DTWs(fullInds)); 
+    
+    % correlate measures trial-by-trial 
+    [ERSPFileName, ERSPFileDir]    = assemble_file(config_folder.results_folder, 'ERSP_pruned', ['_' trialType '_' sessionType '_' channelGroup.key '_' windowType '_ERSP_pruned.mat'], Pi);
+    [bandFileName, bandFileDir]    = assemble_file(config_folder.results_folder, 'Band_powers', ['_' trialType '_' sessionType '_' windowType, '_' channelGroup.key '_band_powers.mat'], Pi);
+    ERSPFile    = load(fullfile(ERSPFileDir, ERSPFileName)); 
+    ERSPCell    = struct2cell(ERSPFile); ERSP = ERSPCell{1}; 
+    bandFile    = load(fullfile(bandFileDir, bandFileName)); 
+    bandPowers  = bandFile.trialBandPowers; 
+    behData     = [MS(fullInds), idPhis(fullInds), DTWs(fullInds)];
+    behData(ERSP.outliers,:) = [];% remove power outlier rows to match matrix size
+    
+%     if Pi == 82004
+%         bandPowers(13,:) = []; % strange drops in beh data
+%     elseif Pi == 83009
+%         bandPowers(16,:) = []; % strange drops in beh data
+%     elseif Pi == 84009
+%         bandPowers(end,:) = [];
+%     end
+%     
+
+try 
+    [slopes]    = WM_correlate_EEG_beh(behData, bandPowers); 
+    cSlopes(cInd,:,:)   = slopes; 
+    cInd = cInd +1; 
+catch
+end
+    
+    
 end
 
 pMeans = pMeans';
 cMeans = cMeans'; 
 
 bandNames = {'theta', 'alpha', 'beta', 'gamma'};
-figure;
+f1 = figure;
+sig = 0; 
 for iBand = 1:4
    
-%     b1 = pMeans\patientsPower(:,iBand);
-%     yCalc1 = b1*pMeans;
-%     scatter(pMeans,patientsPower(:,iBand))
-%     hold on
-%     plot(pMeans,yCalc1)
-%     title(['Patients, ' bandNames{iBand}])
-%     ylim([0 1])
     subplot(2,2,iBand)
-    memoryScore = pMeans; power = patientsPower(:,iBand); 
+    memoryScore = pMeans(:,1); power = patientsPower(:,iBand); 
     mdl = fitlm(memoryScore, power); 
     plot(mdl)
     title(['MTLR, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand}]); legend('off'); xlabel('memory score'); ylabel('power')
     
     if mdl.Coefficients.pValue(2) < 0.05
-        disp(['MTLR, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand} ', p = ' num2str(mdl.Coefficients.pValue(2))])
+        disp(['MTLR, ' sessionType, ',' trialType, ',' sessionType, ', ' windowType,',' channelGroup.key '-' bandNames{iBand} ', p = ' num2str(mdl.Coefficients.pValue(2))])
+        sig = 1;
     end
+    
 end
 
-figure;
+f2 = figure;
 for iBand = 1:4
    
-%     b1 = pMeans\patientsPower(:,iBand);
-%     yCalc1 = b1*pMeans;
-%     scatter(pMeans,patientsPower(:,iBand))
-%     hold on
-%     plot(pMeans,yCalc1)
-%     title(['Patients, ' bandNames{iBand}])
-%     ylim([0 1])
     subplot(2,2,iBand)
-    memoryScore = cMeans; power = controlsPower(:,iBand); 
+    memoryScore = cMeans(:,1); power = controlsPower(:,iBand); 
     mdl = fitlm(memoryScore,power);
     plot(mdl)
     title(['CTRL, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand}]); legend('off'); xlabel('memory score'); ylabel('power')
     
     if mdl.Coefficients.pValue(2) < 0.05
-        disp(['CTRL, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand} ', p = ' num2str(mdl.Coefficients.pValue(2))])
+        disp(['CTRL, ' sessionType, ',' trialType, ',' sessionType ', ' windowType,',' channelGroup.key '-' bandNames{iBand} ', p = ' num2str(mdl.Coefficients.pValue(2))])
+        sig = 1; 
     end
+    
 end
     
-    
+if sig == 0
+    close(f1); close(f2); 
+end
+
+% % visualize
+% % Create a heatmap of the correlation coefficients
+% disp(['Correlation matrices for ' trialType '_' windowType, '_' sessionType '_' channelGroup.key '.png'])
+% 
+% f = figure('Position', [100 100 1800 600]);
+% subplot(1,2,1)
+% for rowI = 1:3
+%     for colI = 1:4
+%         [~,pval] = ttest(pSlopes(:,rowI,colI));
+%         if pval < 0.05
+%             disp(['MTLR' ', ' trialType ', ' windowType, ', ' sessionType ', ' channelGroup.key ', row ' num2str(rowI), ', col ' num2str(colI), 'p = ' num2str(pval)])
+%         end
+%     end
+% end
+% 
+% imagesc(squeeze(mean(pSlopes, 'omitnan'))); % 'none' color method for custom colormap
+% 
+% colorbar; 
+% caxis([-0.2,0.2])
+% % Set the labels for rows (behavioral measures) and columns (EEG power bands)
+% rowLabels = {'MS', 'idPhi', 'DTW'}; % Replace with your labels
+% colLabels = {'theta', 'alpha', 'beta', 'gamma'}; % Replace with your labels
+% set(gca, 'YTick', 1:numel(rowLabels), 'YTickLabel', rowLabels);
+% set(gca, 'XTick', 1:numel(colLabels), 'XTickLabel', colLabels);
+% 
+% % Set the title and labels for the heatmap
+% title(['MTLR' ', ' trialType ', ' windowType, ', ' sessionType ', ' channelGroup.key]);
+% xlabel('EEG Power Bands');
+% ylabel('Behavioral Measures');
+% 
+% subplot(1,2,2)
+% imagesc(squeeze(mean(cSlopes, 'omitnan'))); % 'none' color method for custom colormap
+% for rowI = 1:3
+%     for colI = 1:4
+%         [~,pval] = ttest(cSlopes(:,rowI,colI));
+%         if pval < 0.05
+%             disp(['CTRL' ', ' trialType ', ' windowType, ', ' sessionType ', ' channelGroup.key ', row ' num2str(rowI), ', col ' num2str(colI), 'p = ' num2str(pval)])
+%         end
+%     end
+% end
 end
 
