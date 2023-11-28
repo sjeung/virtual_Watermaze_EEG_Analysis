@@ -126,39 +126,43 @@ cMeans = cMeans';
 bandNames = {'theta', 'alpha', 'beta', 'gamma'};
 f1 = figure;
 sig = 0; 
-for iBand = 1:4
-   
-    subplot(2,2,iBand)
-    memoryScore = pMeans(:,1); power = patientsPower(:,iBand); 
-    mdl = fitlm(memoryScore, power); 
-    plot(mdl)
-    title(['MTLR, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand}]); legend('off'); xlabel('memory score'); ylabel('power')
+for iBand = 1
     
+    memoryScore = pMeans(:,1); power = patientsPower(:,iBand);
+    mdl = fitlm(memoryScore, power);
+    hlm = plot(mdl, 'MarkerEdge', 'none', 'MarkerFace', config_visual.pColor, 'MarkerSize', 10);
+    hlm(1).Marker       = 'o';
+    hlm(2).LineWidth    = 3;
+    hlm(2).Color        = config_visual.pColor;
+    hlm(3).Color        = 'none'; hlm(4).Color        = 'none';
+    % title(['MTLR, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand}]); legend('off'); xlabel('memory score'); ylabel('power')
     if mdl.Coefficients.pValue(2) < 0.05
         disp(['MTLR, ' sessionType, ',' trialType, ',' sessionType, ', ' windowType,',' channelGroup.key '-' bandNames{iBand} ', p = ' num2str(mdl.Coefficients.pValue(2))])
         sig = 1;
     end
     
-end
-
-f2 = figure;
-for iBand = 1:4
-   
-    subplot(2,2,iBand)
-    memoryScore = cMeans(:,1); power = controlsPower(:,iBand); 
-    mdl = fitlm(memoryScore,power);
-    plot(mdl)
-    title(['CTRL, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand}]); legend('off'); xlabel('memory score'); ylabel('power')
+    hold on;
     
+    memoryScore = cMeans(:,1); power = controlsPower(:,iBand);
+    mdl = fitlm(memoryScore,power);
+    hlm = plot(mdl, 'MarkerEdge', 'none', 'MarkerFace', config_visual.cColor, 'MarkerSize', 10);
+    hlm(1).Marker       = 'o';
+    hlm(2).LineWidth    = 3;
+    hlm(2).Color        = config_visual.cColor;
+    hlm(3).Color        = 'none'; hlm(4).Color        = 'none';
+    
+    % title(['CTRL, ' sessionType, ',' trialType, ',' windowType,',' channelGroup.key '-' bandNames{iBand}]); legend('off'); xlabel('memory score'); ylabel('power')
+    title(''); xlabel(''); ylabel('');
     if mdl.Coefficients.pValue(2) < 0.05
         disp(['CTRL, ' sessionType, ',' trialType, ',' sessionType ', ' windowType,',' channelGroup.key '-' bandNames{iBand} ', p = ' num2str(mdl.Coefficients.pValue(2))])
-        sig = 1; 
+        sig = 1;
     end
-    
+    set(gca,'fontsize',20)
+    legend(gca,'off')
 end
-    
+
 if sig == 0
-    close(f1); close(f2); 
+    close(f1); %close(f2); 
 end
 
 % % visualize

@@ -1,5 +1,5 @@
 
-function WM_09a_power_spatial_overlay(ERSP, motion, condText, Pi, fBand, chanGroupName, resultsDir, figureDir)
+function WM_09a_power_spatial_overlay(ERSP, motion, trials, condText, Pi, fBand, chanGroupName, resultsDir, figureDir)
 % plot ERSP data onto spatial map 
 % compute distance to target and boundary
 % 
@@ -19,6 +19,30 @@ else
     yChanInd   = 13;
     cLimUpper  = 1; 
 end
+
+% temporary : add these variables to the trial file instead
+tempWM      = load('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\WP8_WM_table.mat'); 
+
+if contains(condText, 'stat')
+    setupInd = 1; 
+else
+    setupInd = 2; 
+end 
+charID      = num2str(Pi-80000); 
+groupInd    = str2double(charID(1)); 
+numInd      = str2double(charID(end-1:end)); 
+
+blocks = tempWM.wm.setup{setupInd}.group{groupInd}.sub{numInd}.blocks;
+if contains(condText, 'probe')
+    ogAngles    = []; 
+    responses   = nan(2,24); 
+    for Bi = 1:numel(blocks)
+        PBi                 = blocks{Bi}.presented_order; 
+        responses(:,(PBi-1)*4 + 1:(PBi-1)*4 + 4)  	= blocks{Bi}.guess.responses;  
+    end
+end
+
+%--------------------------------------------------------------------------
 
 % remove first learning trial
 assert(numel(motion.trial) == size(ERSP.powspctrm,1))
@@ -43,6 +67,7 @@ yBound      = [-4, 4];
 xBinEdges   = xBound(1):0.2:xBound(2); 
 yBinEdges   = yBound(1):0.2:yBound(2);
 
+
 % initialize matrices  
 ERSPMat         = nan(numel(xBinEdges)-1,numel(yBinEdges)-1);   
 ERSPCell        = cell(numel(xBinEdges)-1,numel(yBinEdges)-1);              % store spatially structured ERSP data
@@ -50,10 +75,16 @@ ERSPCell        = cell(numel(xBinEdges)-1,numel(yBinEdges)-1);              % st
 
 % search for elements in motion data that fits
 for Ti = trialInds
-
-    xVec        = motion.trial{Ti}(xChanInd,1:end-sRate*bufferSec);         % cut off the 1 second offset buffer here
-    yVec        = motion.trial{Ti}(yChanInd,1:end-sRate*bufferSec);
-   
+    
+    xVec        = motion.trial{Ti}(xChanInd,1:end); %-sRate*bufferSec);     % cut off the 1 second offset buffer here
+    yVec        = motion.trial{Ti}(yChanInd,1:end); %-sRate*bufferSec);
+    
+    %......................................................................
+    % temporary - rotate the data points
+    xVec        = xVec*cos(deg2rad(trials(Ti).rotations)) - yVec*sin(deg2rad(trials(Ti).rotations));         % cut off the 1 second offset buffer here
+    yVec        = yVec*cos(deg2rad(trials(Ti).rotations)) + xVec*sin(deg2rad(trials(Ti).rotations));
+    %......................................................................
+    
     % spatial overlay of powers
     for Xi = 1:numel(xBinEdges)-1
         xInBin  = find(xVec >= xBinEdges(Xi) & xVec < xBinEdges(Xi+1));     % indices of all samples that fall into X bin
@@ -62,7 +93,6 @@ for Ti = trialInds
             inds  = intersect(xInBin,yInBin);
             inds  = inds(inds > sRate*bufferSec);                           % cut off the 1 second onset buffer here; 
             if ~isempty(inds)
-                
               % index ERSP by spatial bins
               powers = squeeze(ERSP.powspctrm(Ti,:,freqInds,inds));
               powers = squeeze(mean(powers,[1,2],'omitnan'))';              % average over electrodes and frequencies
@@ -91,6 +121,7 @@ xticklabels = -4:1:4;
 xticks = linspace(1, size(ERSPMat, 2), numel(xticklabels));
 set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
 set(gca, 'YTick', xticks, 'YTickLabel', xticklabels)
+
 
 % save data and figure, then close figure
 save(fullfile(resultsDir, ['sub-' num2str(Pi) '_' condText '_spatial_power_' num2str(fBand(1)) 'to' num2str(fBand(2)) '_Hz_' chanGroupName '.mat']), 'ERSPMat')

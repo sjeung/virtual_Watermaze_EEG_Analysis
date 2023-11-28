@@ -7,7 +7,7 @@ ft_defaults;
 
 % conditions
 sessionTypes        = {'stat', 'mobi'};
-taskTypes          = {'learn', 'probe'};
+taskTypes           = {'learn', 'probe'};
 windowTypes         = {'Start', 'End', 'Mid'};
 
 % participants 
@@ -121,6 +121,11 @@ for Ti = 2
         end
     end
 end
+
+%--------------------------------------------------------------------------
+%% Summray matrix
+%--------------------------------------------------------------------------
+WM_stat_corr_matrix
 
 
 

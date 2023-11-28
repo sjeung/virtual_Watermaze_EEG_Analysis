@@ -19,7 +19,7 @@ if iscell(ERSPAll{1}) && numel(ERSPAll) == 2
     
     ERSPMeanC    = median(ERSPMat,3,'omitnan');
     ERSPMean    = ERSPMeanP - ERSPMeanC; 
-    clims       = [-0.2, 0.2]; 
+    clims       = [-0.5, 0.5]; 
     
 else
     
@@ -61,6 +61,7 @@ xline(0,'black');
 xticks([0, 1, 2, 3])
 colorbar;
 caxis(clims);
+set(gca, 'fontSize',18)
 
 if ~isfolder(fileparts(figFullpath))
     mkdir(fileparts(figFullpath))

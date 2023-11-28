@@ -18,6 +18,10 @@ targetDistC         = nan(58,40,22);
 pCount              = 0; 
 cCount              = 0;
 
+% load ERSP output to get frequency vector
+ERSPDummy = load('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-82002\sub-82002_learn_stat_PM_Start_ERSP_pruned.mat'); 
+freqs = ERSPDummy.ERSPLS.freq; 
+times = 1:40; % ERSPDummy.ERSPLS.time;
 
 %% Iterate over patients
 %--------------------------------------------------------------------------
@@ -132,41 +136,45 @@ figure;
 %yticks          = linspace(1, size(targetDistCN, 1), numel(yticklabels));    
 
 subplot(2,2,1)
-imagesc(flipud(centerDistPN), [0,climUpper]); hold on; colorbar; 
+imagesclogy(times, freqs, centerDistPN, [0,climUpper]); hold on; colorbar; 
 title(['Center distance, MTLR, ' trialType], 'Interpreter', 'none')
 xticklabels = 0:4; 
 xticks      = linspace(1, size(centerDistPN, 2), numel(xticklabels));
 set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
+set(gca,'YDir','normal')
 %set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
 xlabel('Distance')
 ylabel('Hz')
 
 subplot(2,2,2)
-imagesc(flipud(targetDistPN), [0,climUpper]); hold on; colorbar; 
+imagesclogy(times, freqs, targetDistPN, [0,climUpper]); hold on; colorbar; 
 title(['Target distance, MTLR, ' trialType], 'Interpreter', 'none')
 xticklabels = 0:8; 
 xticks      = linspace(1, size(targetDistPN, 2), numel(xticklabels));
 set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
+set(gca,'YDir','normal')
 %set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
 xlabel('Distance')
 ylabel('Hz')
 
 subplot(2,2,3)
-imagesc(flipud(centerDistCN), [0,climUpper]); hold on; colorbar; 
+imagesclogy(times, freqs, centerDistCN, [0,climUpper]); hold on; colorbar; 
 title(['Center distance, CTRL, ' trialType], 'Interpreter', 'none')
 xticklabels = 0:4; 
 xticks      = linspace(1, size(centerDistCN, 2), numel(xticklabels));
 set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
 %set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
+set(gca,'YDir','normal')
 xlabel('Distance')
 ylabel('Hz')
 
 subplot(2,2,4)
-imagesc(flipud(targetDistCN), [0,climUpper]); hold on; colorbar; 
+imagesclogy(times, freqs, targetDistCN, [0,climUpper]); hold on; colorbar; 
 title(['Target distance, CTRL, ' trialType], 'Interpreter', 'none')
 xticklabels = 0:8; 
 xticks      = linspace(1, size(targetDistCN, 2), numel(xticklabels));
 set(gca, 'XTick', xticks, 'XTickLabel', xticklabels)
+set(gca,'YDir','normal')
 %set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
 xlabel('Distance')
 ylabel('Hz')

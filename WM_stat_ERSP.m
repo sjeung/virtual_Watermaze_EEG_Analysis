@@ -163,7 +163,7 @@ if doERSPStat
     
     sigClusters = find(p_values < 0.05);
     
-    for Ci = sigClusters
+    for Ci = 1; % sigClusters
         
         disp([num2str(Ci) ' out of ' num2str(numel(sigClusters)) ' significant cluster found'])
         mask = clusters{Ci};
