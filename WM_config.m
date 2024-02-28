@@ -10,7 +10,7 @@ config_folder.figures_folder   = fullfile(config_folder.project_folder, 'WM_EEG_
 % data folder and file names 
 %--------------------------------------------------------------------------
 config_folder.bids_folder              = '0_BIDS-data';
-config_folder.set_folder               = '1_basic-EEGLAB_HMD_only';
+config_folder.set_folder               = '1_basic-EEGLAB_HMD_only';         % means that no torso mocap streams are imported
     config_folder.rawFileNameEEG              = '_merged_EEG.set'; 
     config_folder.rawFileNameMotion           = '_merged_MOTION.set'; 
 config_folder.trimmed_folder           = '2_trimmed'; 

@@ -62,15 +62,23 @@ for Pi = allParticipants
     end
 end
 
+%--------------------------------------------------------------------------
+%% Visualize topography of different frequency bands
+%--------------------------------------------------------------------------
+for Fi = 1:4
+    WM_topo_power(config_param.FOI_lower(Fi), config_param.FOI_upper(Fi), allParticipants); 
+end
 
 %--------------------------------------------------------------------------
 %% Aggregate baseline spectral analysis results
 %--------------------------------------------------------------------------
+WM_stat_baseline('all', 'stand');
+WM_stat_baseline('all', 'walk');
+
 for Gi = 1:2
     WM_stat_baseline(config_param.chanGroups(Gi), 'stand');
     WM_stat_baseline(config_param.chanGroups(Gi), 'walk');
 end
-
 
 %--------------------------------------------------------------------------
 %% Aggregate temporal ERSP results
@@ -87,7 +95,6 @@ for Gi = 1:2
         end
     end
 end
-
 
 %--------------------------------------------------------------------------
 %% Aggregate spatial analysis results
