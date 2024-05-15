@@ -59,8 +59,8 @@ for cInd = 1:6
         outCell{cInd} = union(outCell{cInd}, [1,4,7,10,13,16]); 
     end
 end
-
-% remvoe outliers from ERSP fields
+ 
+% remove outliers from ERSP fields
 ERSPLS.powspctrm(outCell{1},:,:,:)  = [];
 ERSPLM.powspctrm(outCell{2},:,:,:)  = [];
 ERSPLE.powspctrm(outCell{3},:,:,:)  = [];
@@ -102,7 +102,6 @@ save([prunedFileDir '\sub-' num2str(Pi) '_learn_' sessionType '_' channelGroup.k
 save([prunedFileDir '\sub-' num2str(Pi) '_probe_' sessionType '_' channelGroup.key '_Start_ERSP_pruned.mat'],   'ERSPPS');
 save([prunedFileDir '\sub-' num2str(Pi) '_probe_' sessionType '_' channelGroup.key '_Mid_ERSP_pruned.mat'],     'ERSPPM');
 save([prunedFileDir '\sub-' num2str(Pi) '_probe_' sessionType '_' channelGroup.key '_End_ERSP_pruned.mat'],     'ERSPPE');
-
 
 f = figure;
 cfg             = [];

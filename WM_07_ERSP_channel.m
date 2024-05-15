@@ -30,6 +30,15 @@ util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProb
 [ERSPWalkBaseMOBI]      = util_WM_ERSP(elecGroup.chan_names, 'walk', 'stat', Pi, freqRange);
 [ERSPWalkBaseSTAT]      = util_WM_ERSP(elecGroup.chan_names, 'walk', 'mobi', Pi, freqRange);
 
+[baseFileName,baseFileDir] = assemble_file(config_folder.results_folder, [config_folder.ersp_folder '_base'], '_base_ERSP.mat', Pi);
+
+if ~isfolder(baseFileDir)
+    mkdir(baseFileDir)
+end
+
+% save data from baseline 
+save(fullfile(baseFileDir, baseFileName), 'ERSPStandBaseMOBI', 'ERSPStandBaseSTAT', 'ERSPWalkBaseMOBI', 'ERSPWalkBaseSTAT',  '-v7.3'); 
+
 % compare walking baseline activity against standing baseline
 util_WM_basecorrect(ERSPWalkBaseSTAT, ERSPStandBaseSTAT, Pi, ['walk_versus_stand_stat_', elecGroup.key]);
 util_WM_basecorrect(ERSPWalkBaseMOBI, ERSPStandBaseMOBI, Pi, ['walk_versus_stand_mobi_', elecGroup.key]);

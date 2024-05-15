@@ -1,10 +1,6 @@
 
 function  WM_stat_baseline(channelGroup, baseType)
 
-if ~exist('ALLEEG', 'var')
-    eeglab;
-end
-
 sessions = {'stat', 'mobi'};
 WM_config;
 freqRange                   = config_param.ERSP_freq_range;
@@ -13,38 +9,38 @@ pSpectra    = {};
 cSpectra    = {};
 
 for sInd = 1:2
+    
     sessionType = sessions{sInd}; 
-    
-    pSpectra{sInd} = NaN(10,58);
-    cSpectra{sInd} = NaN(20,58);
-    
-    patientIDs      = 81001:81011;
-    controlIDs      = [82001:82011, 83001:83011, 84009];
-    excludedIDs     = [81005, 82005, 83005, 81008, 82009, 83004]; % participant group 5 excluded due to psychosis. participant 81008 excluded due to massive spectral artefact
-    patientIDs      = setdiff(patientIDs, excludedIDs);
-    controlIDs      = setdiff(controlIDs, excludedIDs);
-    
     baseFilePath = fullfile(config_folder.results_folder, 'baseline_spectra', [channelGroup.key '_' baseType '_' sessionType '_baseline.mat']);
-    
+       
     if exist(baseFilePath, 'file')
         loadedVar   = load(baseFilePath);
-        pSpectra{sInd}    = loadedVar.pSpectra;
-        cSpectra{sInd}    = loadedVar.cSpectra;
+        pSpectra    = loadedVar.pSpectra;
+        cSpectra    = loadedVar.cSpectra;
         baseERSP    = loadedVar.baseERSP;
     else
+        pSpectra{sInd} = NaN(10,58);
+        cSpectra{sInd} = NaN(20,58);
+        
+        patientIDs      = 81001:81011;
+        controlIDs      = [82001:82011, 83001:83011, 84009];
+        excludedIDs     = [81005, 82005, 83005, 81008, 82009, 83004]; % participant group 5 excluded due to psychosis. participant 81008 excluded due to massive spectral artefact
+        patientIDs      = setdiff(patientIDs, excludedIDs);
+        controlIDs      = setdiff(controlIDs, excludedIDs);
+        
         pCount = 1;
         cCount = 1;
         
         for Pi = patientIDs
             baseERSP                                = util_WM_ERSP(channelGroup.chan_names, baseType, sessionType, Pi, freqRange);
-            pSpectra{sInd}(pCount,:)                      = squeeze(mean(baseERSP.powspctrm, [1,2,4], 'omitnan'))';
+            pSpectra{sInd}(pCount,:)                = squeeze(mean(baseERSP.powspctrm, [1,2,4], 'omitnan'))';
             pCount  = pCount + 1;
         end
         
         
         for Pi = controlIDs
             baseERSP                                = util_WM_ERSP(channelGroup.chan_names, baseType, sessionType, Pi, freqRange);
-            cSpectra{sInd}(cCount,:)                      = squeeze(mean(baseERSP.powspctrm, [1,2,4], 'omitnan'))';
+            cSpectra{sInd}(cCount,:)                = squeeze(mean(baseERSP.powspctrm, [1,2,4], 'omitnan'))';
             cCount  = cCount + 1;
         end
         
@@ -54,16 +50,16 @@ for sInd = 1:2
         
         save(baseFilePath, 'pSpectra', 'cSpectra', 'baseERSP')
         
-        pSpectra{sInd}(any(isnan(pSpectra),2),:)  = [];
-        cSpectra{sInd}(any(isnan(cSpectra),2),:)  = [];
-
+        pSpectra{sInd}(any(isnan(pSpectra{sInd}),2),:)  = [];
+        cSpectra{sInd}(any(isnan(cSpectra{sInd}),2),:)  = [];
+        
     end
 end
 
-pSpectraStat = 10*log(pSpectra{1}); 
-cSpectraStat = 10*log(cSpectra{1}); 
-pSpectraMoBI = 10*log(pSpectra{2}); 
-cSpectraMoBI = 10*log(cSpectra{2}); 
+pSpectraStat = 10*log(pSpectra{1});
+cSpectraStat = 10*log(cSpectra{1});
+pSpectraMoBI = 10*log(pSpectra{2});
+cSpectraMoBI = 10*log(cSpectra{2});
 
 % Assuming you have pSpectra and cSpectra matrices
 % Calculate the mean and standard error for each frequency
@@ -116,18 +112,23 @@ xticklabelsCell = arrayfun(@num2str, round(freqPoints(1:5:size(cSpectra{1},2))),
 xticklabels(xticklabelsCell);
 xlabel('Frequencies in Hz')
 title(['Spectra baseline ' baseType ', ' channelGroup.key ])
+save()
 
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(pSpectra{1}',cSpectra{1}', false, 0.05, 1000);
 
 if p_values < 0.05
-    msgbox(['Spectra baseline ' baseType ', ' sessions{1} ', ' channelGroup.key ])
+    disp(['Spectra baseline ' baseType ', ' sessions{1} ', ' channelGroup.key ])
+    disp('frequencies in cluster')
+    disp(baseERSP.freq(clusters{1}))
 end 
 
 
 [clusters, p_values, t_sums, permutation_distribution ] = permutest(pSpectra{2}',cSpectra{2}', false, 0.05, 1000);
 
 if p_values < 0.05
-    msgbox(['Spectra baseline ' baseType ', ' sessions{2} ', ' channelGroup.key ])
+    disp(['Spectra baseline ' baseType ', ' sessions{2} ', ' channelGroup.key ])
+    disp('frequencies in cluster')
+    disp(baseERSP.freq(clusters{1}))
 end 
 
 
