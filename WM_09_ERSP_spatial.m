@@ -66,26 +66,30 @@ for Fi = 1:4
     
     fBand               = [config_param.FOI_lower(Fi), config_param.FOI_upper(Fi)];
     
-    % a. overlay of power values onto space
-    WM_09a_power_spatial_overlay(ERSPLearnS, MotionLearnS, 'stat_learn', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
-    WM_09a_power_spatial_overlay(ERSPLearnM, MotionLearnM, 'mobi_learn', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
-    WM_09a_power_spatial_overlay(ERSPProbeS, MotionProbeS, 'stat_probe', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
-    WM_09a_power_spatial_overlay(ERSPProbeM, MotionProbeM, 'mobi_probe', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
-    
-    % b. overlay of power values onto space, centered around target
-    WM_09b_power_spatial_overlay_target(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
-    WM_09b_power_spatial_overlay_target(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
-    WM_09b_power_spatial_overlay_target(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
-    WM_09b_power_spatial_overlay_target(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
-    
+%     % a. overlay of power values onto space
+%     WM_09a_power_spatial_overlay(ERSPLearnS, MotionLearnS, 'stat_learn', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+%     WM_09a_power_spatial_overlay(ERSPLearnM, MotionLearnM, 'mobi_learn', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+%     WM_09a_power_spatial_overlay(ERSPProbeS, MotionProbeS, 'stat_probe', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+%     WM_09a_power_spatial_overlay(ERSPProbeM, MotionProbeM, 'mobi_probe', Pi, fBand, elecGroup.key, overlayResultsDir, overlayFigureDir)
+%     
+%     % b. overlay of power values onto space, centered around target
+%     WM_09b_power_spatial_overlay_target(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+%     WM_09b_power_spatial_overlay_target(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+%     WM_09b_power_spatial_overlay_target(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+%     WM_09b_power_spatial_overlay_target(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, fBand, elecGroup.key, overlayTargetResultsDir, overlayTargetFigureDir)
+%     
    
 end
+% 
+% % c. power ordered by distacne to target/center
+% WM_09c_power_spatial_dist(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, elecGroup.key, distResultsDir, distFigureDir)
+% WM_09c_power_spatial_dist(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, elecGroup.key, distResultsDir, distFigureDir)
+% WM_09c_power_spatial_dist(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
+% WM_09c_power_spatial_dist(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
 
-% c. power ordered by distacne to target/center
-WM_09c_power_spatial_dist(ERSPLearnS, MotionLearnS, TrialLearnS, 'stat_learn', Pi, elecGroup.key, distResultsDir, distFigureDir)
-WM_09c_power_spatial_dist(ERSPLearnM, MotionLearnM, TrialLearnM, 'mobi_learn', Pi, elecGroup.key, distResultsDir, distFigureDir)
-WM_09c_power_spatial_dist(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
-WM_09c_power_spatial_dist(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
+% d. power ordered by angular velocity
+WM_09d_power_angular_velocity(ERSPProbeS, MotionProbeS, TrialProbeS, 'stat_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
+WM_09d_power_angular_velocity(ERSPProbeM, MotionProbeM, TrialProbeM, 'mobi_probe', Pi, elecGroup.key, distResultsDir, distFigureDir)
 
 
 end
