@@ -1,6 +1,12 @@
-function [ERSP] = util_WM_ERSP(elecNames, trialType, session, Pi, freqRange)
+function [ERSP] = util_WM_ERSP(elecNames, trialType, session, Pi, freqRange, varargin)
+
 WM_config; 
-[epochedFileName,epochedFileDir] = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
+
+if nargin == 6 
+    [epochedFileName,epochedFileDir] = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched_' varargin{1} '.mat'], Pi);
+else
+    [epochedFileName,epochedFileDir] = assemble_file(config_folder.data_folder, config_folder.epoched_folder, ['_' trialType '_' session '_epoched.mat'], Pi);
+end
 
 % load data
 load(fullfile(epochedFileDir, epochedFileName), 'ftEEG');
@@ -18,19 +24,14 @@ cfg.pad                 = 'nextpow2';
 cfg.padratio            = 4;
 cfg.baseline            = NaN;
 cfg.datatype            = 'raw';
-cfg.keeptrials          = 'yes';
+
+if iscell(elecNames)
+    cfg.keeptrials      = 'yes';
+else
+    cfg.keeptrials      = 'no'; 
+end
+
 ERSP                    = ft_freqanalysis(cfg, EEG);
 
-% % % plot the ERSP using FieldTrip functions
-% f = figure;
-% cfg             = [];
-% cfg.colorbar    = 'yes';  % Display colorbar
-% cfg.zlim        = [0,4];
-% cfg.figure      = 'gcf';
-% set(gcf,'Position',[100 100 2500 500])
-% 
-% hold on; 
-% cfg.xlim        = [-0.5,3];
-% ft_singleplotTFR(cfg, ERSP);
-% title('Uncorrected ERSP', 'FontSize', 15)
+
 end
