@@ -56,10 +56,10 @@ for sInd = 1:2
     end
 end
 
-pSpectraStat = 10*log(pSpectra{1});
-cSpectraStat = 10*log(cSpectra{1});
-pSpectraMoBI = 10*log(pSpectra{2});
-cSpectraMoBI = 10*log(cSpectra{2});
+pSpectraStat = log(pSpectra{1});
+cSpectraStat = log(cSpectra{1});
+pSpectraMoBI = log(pSpectra{2});
+cSpectraMoBI = log(cSpectra{2});
 
 % Assuming you have pSpectra and cSpectra matrices
 % Calculate the mean and standard error for each frequency
@@ -78,7 +78,7 @@ std_cSpectraMoBI    = nanstd(cSpectraMoBI, 1);
 frequencies = 1:size(pSpectra{1}, 2); % You may need to adjust this based on your data
 
 % Plot the mean lines
-figure;
+f = figure;
 plot(frequencies, mean_pSpectraStat, 'LineWidth', 3, 'Color', config_visual.pColor);
 hold on;
 plot(frequencies, mean_cSpectraStat, 'LineWidth', 3, 'Color', config_visual.cColor);
@@ -100,9 +100,9 @@ y_c = [mean_cSpectraMoBI + std_cSpectraMoBI, fliplr(mean_cSpectraMoBI - std_cSpe
 fill(x, y_c, config_visual.cColor, 'FaceAlpha', 0.2, 'EdgeColor', 'none'); % Fill confidence interval area for cSpectra
 
 
-ylim([-40 80]);
+ylim([-5 5]);
 xlabel('Frequencies');
-ylabel('Power (dB)');
+ylabel(['Power Spectral Density (\muV^2/Hz)']);
 title('Power Spectra with Confidence Intervals');
 legend('MTLR-stat', 'CTRL-stat', 'MTLR-mobi', 'CTRL-mobi');
 grid on; 
@@ -112,23 +112,29 @@ xticklabelsCell = arrayfun(@num2str, round(freqPoints(1:5:size(cSpectra{1},2))),
 xticklabels(xticklabelsCell);
 xlabel('Frequencies in Hz')
 title(['Spectra baseline ' baseType ', ' channelGroup.key ])
-save()
+saveas(f, ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\Baseline PSD\base-' baseType '_' channelGroup.key '.png'])
 
-[clusters, p_values, t_sums, permutation_distribution ] = permutest(pSpectra{1}',cSpectra{1}', false, 0.05, 1000);
+[clusters, p_values, t_sums, permutation_distribution ] = permutest(pSpectra{1}',cSpectra{1}', false, 0.05, 2000, true);
 
 if p_values < 0.05
     disp(['Spectra baseline ' baseType ', ' sessions{1} ', ' channelGroup.key ])
     disp('frequencies in cluster')
     disp(baseERSP.freq(clusters{1}))
+else
+    disp(['Spectra baseline ' baseType ', ' sessions{1} ', ' channelGroup.key ])
+    disp('frequencies in cluster not significantly different')
 end 
 
 
-[clusters, p_values, t_sums, permutation_distribution ] = permutest(pSpectra{2}',cSpectra{2}', false, 0.05, 1000);
+[clusters, p_values, t_sums, permutation_distribution ] = permutest(pSpectra{2}',cSpectra{2}', false, 0.05, 2000, true);
 
 if p_values < 0.05
     disp(['Spectra baseline ' baseType ', ' sessions{2} ', ' channelGroup.key ])
     disp('frequencies in cluster')
     disp(baseERSP.freq(clusters{1}))
+else
+    disp(['Spectra baseline ' baseType ', ' sessions{2} ', ' channelGroup.key ])
+    disp('frequencies in cluster not significantly different')
 end 
 
 
