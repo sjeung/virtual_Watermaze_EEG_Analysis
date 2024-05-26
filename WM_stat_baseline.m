@@ -101,8 +101,7 @@ fill(x, y_c, config_visual.cColor, 'FaceAlpha', 0.2, 'EdgeColor', 'none'); % Fil
 
 
 ylim([-5 5]);
-xlabel('Frequencies');
-ylabel(['Power Spectral Density (\muV^2/Hz)']);
+ylabel('Log Power Spectral Density (\muV^2/Hz)');
 title('Power Spectra with Confidence Intervals');
 legend('MTLR-stat', 'CTRL-stat', 'MTLR-mobi', 'CTRL-mobi');
 grid on; 
