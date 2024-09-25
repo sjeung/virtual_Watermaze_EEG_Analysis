@@ -1,5 +1,5 @@
 
-function WM_09c_power_spatial_dist(ERSP, motion, trials, condText, Pi, chanGroupName, resultsDir, figureDir)
+function WM_09d_power_angular_velocity(ERSP, motion, condText, Pi, chanGroupName, resultsDir, figureDir)
 % plot ERSP data onto spatial map 
 % compute distance to target and boundary
 % 
@@ -9,26 +9,19 @@ function WM_09c_power_spatial_dist(ERSP, motion, trials, condText, Pi, chanGroup
 sRate           = 250; 
 bufferSec       = 1; % buffer at trial end 
 
-
-% load baseline spectra 
-baseline = load('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\baseline_spectra\FM_walk_mobi_baseline.mat');
-
 % assign channel indices depending on the session
 if contains(condText, 'mobi')
     yawInd     = 1; 
     xChanInd   = 4;
     yChanInd   = 6;
-    cLimUpper  = 15; 
+    cLimUpper  = 10; 
     maxAngVel   = 1.5; 
-    baselinePower = baseline.pSpectra{2}(1,:); 
-
 else
     yawInd     = 8; 
     xChanInd   = 11;
     yChanInd   = 13;
-    cLimUpper  = 8; 
+    cLimUpper  = 1; 
     maxAngVel   = 1; 
-    baselinePower = baseline.pSpectra{1}(1,:); 
 end
 
 
@@ -47,7 +40,7 @@ end
 disp(['Angular velocity analysis for ' num2str(Pi) ',' motion.label{xChanInd}, ', ' motion.label{yChanInd} ', ' condText])
 
 % create bins for plot
-avBinEdges   = 0:0.1:maxAngVel;                                                   % target distance can go up to twice the radius
+avBinEdges   = 0:0.1:maxAngVel;                                             % target distance can go up to twice the radius
 
 % initialize matrices                  
 avMat           = nan(numel(ERSP.freq),numel(avBinEdges)-1);                     
@@ -68,30 +61,14 @@ for Ti = trialInds
     smoothedAngularVelocity = movmean(angularVelocity, windowSize);
     avVec   = smoothedAngularVelocity; 
     
-    % Plot the results
-    time = (0:length(yawVec)-2) * dt; % Adjust the time vector for angular velocity
-    
-%     figure;
-%     subplot(2,1,1);
-%     plot(time, angularVelocity);
-%     title('Angular Velocity (Numerical Differentiation)');
-%     xlabel('Time (seconds)');
-%     ylabel('Angular Velocity');
-%     
-%     subplot(2,1,2);
-%     plot(time, smoothedAngularVelocity);
-%     title('Smoothed Angular Velocity');
-%     xlabel('Time (seconds)');
-%     ylabel('Smoothed Angular Velocity');
-
     % power ordered by angular velocity 
     for avBin = 1:numel(avBinEdges)-1
         inds    = find(avVec >= avBinEdges(avBin) & avVec < avBinEdges(avBin+1));
         inds    = inds(inds > sRate*bufferSec);                             % cut off the 1 second onset buffer here;
        
         if ~isempty(inds)
-            powers  = squeeze(ERSP.powspctrm(Ti,:,:,inds));
-            powers  = squeeze(mean(powers, 1));                             % average over electrodes
+            powers  = squeeze(ERSP.powspctrm(Ti,:,inds));
+            %powers  = squeeze(mean(powers, 1));                            % average over electrodes
             
             if numel(inds) == 1
                 powers = powers';                                           % this prevents autotranspose in case only one sample is in bin
@@ -109,8 +86,6 @@ for avBin = 1:numel(avBinEdges)-1
         avMat(:,avBin) = squeeze(median(avCell{avBin}, 2));
     end
 end
-this = avMat./baselinePower'; 
-avMat  = this; 
 
 % visualize distance ERSP
 f1 = figure; 
@@ -130,7 +105,7 @@ title([num2str(Pi) ', by idPhi, ' condText], 'Interpreter', 'none')
 % save data and figure, then close figure
 save(fullfile(resultsDir, ['sub-' num2str(Pi) '_' condText '_angvel_' chanGroupName '.mat']), 'avMat')
 saveas(f1,fullfile(figureDir, ['sub-' num2str(Pi) '_' condText '_angvel_' chanGroupName '.png']))
-%close(f1);
+close(f1);
 
 
 end

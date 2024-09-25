@@ -62,8 +62,8 @@ for Ti = trialInds
         inds    = find(tdVec >= tBinEdges(tdBin) & tdVec < tBinEdges(tdBin+1));
         inds    = inds(inds > sRate*bufferSec);                             % cut off the 1 second onset buffer here;
         if ~isempty(inds)
-            powers  = squeeze(ERSP.powspctrm(Ti,:,:,inds));
-            powers  = squeeze(mean(powers, 1));                             % average over electrodes
+            powers  = squeeze(ERSP.powspctrm(Ti,:,inds));
+            %powers  = squeeze(mean(powers, 1));                             % average over electrodes
             
             if numel(inds) == 1
                 powers = powers';                                           % this prevents autotranspose in case only one sample is in bin
@@ -78,8 +78,8 @@ for Ti = trialInds
         inds    = find(cdVec >= cBinEdges(cdBin) & cdVec < cBinEdges(cdBin+1));
         inds    = inds(inds > sRate*bufferSec);                             % cut off the 1 second onset buffer here;
         if ~isempty(inds)
-            powers  = squeeze(ERSP.powspctrm(Ti,:,:,inds));
-            powers  = squeeze(mean(powers, 1));
+            powers  = squeeze(ERSP.powspctrm(Ti,:,inds));
+            %powers  = squeeze(mean(powers, 1));
 
             if numel(inds) == 1
                 powers = powers';               

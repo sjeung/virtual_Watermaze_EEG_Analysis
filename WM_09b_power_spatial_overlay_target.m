@@ -70,8 +70,8 @@ for Ti = trialInds
             if ~isempty(inds)
                 
                 % index ERSP by spatial bins
-                powers = squeeze(ERSP.powspctrm(Ti,:,freqInds,inds));
-                powers = squeeze(mean(powers,[1,2],'omitnan'))';              % average over electrodes and frequencies
+                powers = squeeze(ERSP.powspctrm(Ti,freqInds,inds));
+                powers = squeeze(mean(powers,1,'omitnan'));              % average over electrodes and frequencies
                 ERSPCellTarget{Xi, Yi} = [ERSPCellTarget{Xi, Yi} powers(~isnan(powers))]; % concatenate samples to normalize later
                 
             end

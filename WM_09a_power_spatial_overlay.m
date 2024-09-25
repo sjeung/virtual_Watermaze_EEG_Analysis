@@ -1,5 +1,5 @@
 
-function WM_09a_power_spatial_overlay(ERSP, motion, trials, condText, Pi, fBand, chanGroupName, resultsDir, figureDir)
+function WM_09a_power_spatial_overlay(ERSP, motion, condText, Pi, fBand, chanGroupName, resultsDir, figureDir)
 % plot ERSP data onto spatial map 
 % compute distance to target and boundary
 % 
@@ -34,12 +34,16 @@ numInd      = str2double(charID(end-1:end));
 
 blocks = tempWM.wm.setup{setupInd}.group{groupInd}.sub{numInd}.blocks;
 if contains(condText, 'probe')
+    rotationOn  = 1; 
     ogAngles    = []; 
     responses   = nan(2,24); 
     for Bi = 1:numel(blocks)
         PBi                 = blocks{Bi}.presented_order; 
         responses(:,(PBi-1)*4 + 1:(PBi-1)*4 + 4)  	= blocks{Bi}.guess.responses;  
+        ogAngles                                    = [ogAngles, blocks{Bi}.guess.rotations];
     end
+else
+    rotationOn = 0; 
 end
 
 %--------------------------------------------------------------------------
@@ -79,11 +83,13 @@ for Ti = trialInds
     xVec        = motion.trial{Ti}(xChanInd,1:end); %-sRate*bufferSec);     % cut off the 1 second offset buffer here
     yVec        = motion.trial{Ti}(yChanInd,1:end); %-sRate*bufferSec);
     
-    %......................................................................
-    % temporary - rotate the data points
-    xVec        = xVec*cos(deg2rad(trials(Ti).rotations)) - yVec*sin(deg2rad(trials(Ti).rotations));         % cut off the 1 second offset buffer here
-    yVec        = yVec*cos(deg2rad(trials(Ti).rotations)) + xVec*sin(deg2rad(trials(Ti).rotations));
-    %......................................................................
+%     %......................................................................
+%     % NOT TESTED IF ROTATION IS CORRECT 
+%     if rotationOn
+%         xVec        = xVec*cos(deg2rad(-ogAngles(Ti))) - yVec*sin(deg2rad(-ogAngles(Ti)));         % cut off the 1 second offset buffer here
+%         yVec        = yVec*cos(deg2rad(-ogAngles(Ti))) + xVec*sin(deg2rad(-ogAngles(Ti)));
+%     end
+%     %......................................................................
     
     % spatial overlay of powers
     for Xi = 1:numel(xBinEdges)-1
@@ -94,8 +100,8 @@ for Ti = trialInds
             inds  = inds(inds > sRate*bufferSec);                           % cut off the 1 second onset buffer here; 
             if ~isempty(inds)
               % index ERSP by spatial bins
-              powers = squeeze(ERSP.powspctrm(Ti,:,freqInds,inds));
-              powers = squeeze(mean(powers,[1,2],'omitnan'))';              % average over electrodes and frequencies
+              powers = squeeze(ERSP.powspctrm(Ti,freqInds,inds));
+              powers = squeeze(mean(powers,1,'omitnan'));                   % average over electrodes and frequencies
               ERSPCell{Xi, Yi} = [ERSPCell{Xi, Yi} powers(~isnan(powers))]; % concatenate samples to normalize later
               
             end
