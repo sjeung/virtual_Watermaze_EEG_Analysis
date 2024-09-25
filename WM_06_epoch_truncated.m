@@ -11,7 +11,7 @@ trialTypes                          = {'learn', 'probe'};
 baselineTrialTypes                  = {'stand', 'walk'};
 sessions                            = {'mobi', 'stat'};
 epochWidth                          = 3; % in seconds
-timeBuffer                          = 0.5;                                    % in seconds (trials will be cut with -buffer, +buffer around the edge events)
+timeBuffer                          = 1;                                    % in seconds (trials will be cut with -buffer, +buffer around the edge events)
 
 [cleanedFileName,cleanedFileDir]    = assemble_file(config_folder.data_folder, config_folder.cleaned_folder, config_folder.cleanedFileName, Pi);
 [motionFileName,motionFileDir]      = assemble_file(config_folder.data_folder, config_folder.trimmed_folder, config_folder.trimmedFileNameMotion, Pi);
