@@ -28,8 +28,9 @@ lineInd     = find(ICLabel.classifications(:,6) > ICThreshold);
 allInds     = union(muscleInd, union(eyeInd, union(heartInd,union(chanInd,lineInd)))); 
 
 % subtract components
-cleanedEEG = pop_subcomp(EEG, allInds); 
-cleanedEEG.etc.rank = size(cleanedEEG.icaweights, 1); 
+cleanedEEG              = pop_subcomp(EEG, allInds); 
+cleanedEEG.etc.rank     = size(cleanedEEG.icaweights, 1); 
+cleanedEEG.etc.nICrej   = size(allInds); 
 
 % save results
 if ~isfolder(cleanedFileDir)
