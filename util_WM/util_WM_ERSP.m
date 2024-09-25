@@ -25,7 +25,7 @@ cfg.padratio            = 4;
 cfg.baseline            = NaN;
 cfg.datatype            = 'raw';
 
-if iscell(elecNames)
+if iscell(elecNames)&& ~contains(trialType, 'stand') && ~contains(trialType, 'walk') 
     cfg.keeptrials      = 'yes';
 else
     cfg.keeptrials      = 'no'; 

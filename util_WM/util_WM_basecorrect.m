@@ -9,9 +9,13 @@ if ~isfolder(erspFileDir)
     mkdir(erspFileDir)
 end
 
+allChans = 0; 
 % check if the ERSPs have trials
 if ndims(ERSPbase.powspctrm) == 3
-    trialOn = 0;
+    trialOn = 0; 
+    if numel(ERSPbase.label) > 60
+       allChans = 1;  % this is for topoplot
+    end
 else
     trialOn = 1;
 end
@@ -22,14 +26,9 @@ if any(timeDiff > 0.3)
     error('baseline and data frequency points differ too much');            % difference frequencies should be under 0.3 Hz
 end
 
-if trialOn
-    % remove outliers from baseline trials
-    baseTrials  = mean(ERSPbase.powspctrm, [2,3,4], 'omitnan');
-    [outInds,~] = util_WM_IQR(baseTrials);                                  % use IQR methods due to non-normal distribution
-    
+if ~allChans  
     % average baseline data over trials and samples
-    powerTrials                 = mean(ERSPbase.powspctrm, 4, 'omitnan');   % trials X channels X freqs
-    powerTrials(outInds,:,:)    = [];                                       % take out outlier trials
+    powerTrials                 = mean(ERSPbase.powspctrm, 3, 'omitnan');   % trials X channels X freqs 
     baseMean                    = mean(powerTrials,1,'omitnan');            % average over trials
     baseMat                     = repmat(baseMean, size(ERSPdata.powspctrm,1),1,1,size(ERSPdata.powspctrm,4));
 else
@@ -37,12 +36,16 @@ else
     powerTrials                 = mean(ERSPbase.powspctrm, [2,3], 'omitnan');        % trials X channels X freqs
     baseMat                     = repmat(powerTrials,1,1,size(ERSPdata.powspctrm,3));    
 end
+clear ERSPbase
 
 % corrected ERSP
 ERSPcorr                        = ERSPdata;                                 % copy data structure of the input
-ERSPcorr.powspctrm              = mean(ERSPdata.powspctrm,2) ./ baseMat;
+clear ERSPdata powerTrials
+ERSPcorr.powspctrm              = squeeze(mean(ERSPcorr.powspctrm,2));
+ERSPcorr.powspctrm              = ERSPcorr.powspctrm ./ squeeze(baseMat);
+ERSPcorr.dimord                 = 'rpt_freq_time'; 
 
-if ~trialOn % topoplot
+if allChans
     cfg             = [];
     cfg.layout      = ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\source-data\' num2str(Pi) '\' num2str(Pi) '_eloc.elc'];
     ERSPcorr.freq   = mean(ERSPcorr.freq); 
