@@ -48,8 +48,13 @@ pEnds           = find(contains({EEG.event.type}, 'guesstrial:keypress'));
 
 assert(numel(lStarts) == numel(lEnds));
 assert(numel(pStarts) == numel(pEnds));
-assert(numel(lStarts) == 36);
-assert(numel(pStarts) == 48);
+
+if Pi ~= 83004
+    assert(numel(lStarts) == 36);
+    assert(numel(pStarts) == 48);
+else
+    disp(['Participant 83004 has ' num2str(numel(lStarts)) ' learn and ' num2str(numel(pStarts)) ' probe trials'])
+end
 
 learnTrials = [EEG.event(lStarts).latency; EEG.event(lEnds).latency];       % 2 x N vector consisting of start and end indices
 probeTrials = [EEG.event(pStarts).latency; EEG.event(pEnds).latency];       % 2 x N vector consisting of start and end indices
@@ -76,13 +81,21 @@ for iSession    = 1:2
         end
         
         % define stat versus mobi trials: VR comes first and then desktop
-        if strcmp(session, 'mobi')
-            trials = trials(:,1:size(trials,2)/2);                          % extract first half (mobi setup)
+        if strcmp(session, 'mobi') % (83004 VR ends at marker 359, latency 380985)
+            if Pi == 83004 && strcmp(trialType, 'learn')
+                trials = trials(:,1:12);
+            else
+                trials = trials(:,1:size(trials,2)/2);                              % extract first half (mobi setup)
+            end
         elseif strcmp(session, 'stat')
-            trials = trials(:,size(trials,2)/2+1:end);                      % extract second half (stationary setup)
+            if Pi == 83004 && strcmp(trialType, 'learn')
+                trials = trials(:,13:end);
+            else
+                trials = trials(:,size(trials,2)/2+1:end);                          % extract second half (stationary setup)
+            end
         end
         
-        %% Trial start 
+        %% Trial start
         % fill out header information
         hdr.nTrials     = size(trials, 2);
         ftEEG           = [];
