@@ -1,4 +1,4 @@
-function WM_06_epoch(Pi)
+function WM_05_epoch(Pi)
 % epoch data
 % save data in fieldtrip style structure
 %
@@ -136,17 +136,21 @@ for iSession    = 1:2
         end
         
         % define stat versus mobi trials: VR comes first and then desktop
-        if strcmp(session, 'mobi') % (83004 VR ends at marker 359, latency 380985)
+        if strcmp(session, 'mobi') % (83004 VR ends at marker 359, latency 380985, missing two blocks = 6 learn trials and 8 probe trials)
             if Pi == 83004 && strcmp(trialType, 'learn')
                 trials = trials(:,1:12);
+            elseif Pi == 83004 && strcmp(trialType, 'probe')
+                trials = trials(:,1:16);
             else
-                trials = trials(:,1:size(trials,2)/2);                              % extract first half (mobi setup)
+                trials = trials(:,1:size(trials,2)/2);                      % extract first half (mobi setup)
             end
         elseif strcmp(session, 'stat')
             if Pi == 83004 && strcmp(trialType, 'learn')
                 trials = trials(:,13:end);
+            elseif Pi == 83004 && strcmp(trialType, 'probe')
+                trials = trials(:,17:end);
             else
-                trials = trials(:,size(trials,2)/2+1:end);                          % extract second half (stationary setup)
+                trials = trials(:,size(trials,2)/2+1:end);                  % extract second half (stationary setup)
             end
         end
         

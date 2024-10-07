@@ -1,4 +1,4 @@
-function WM_06_epoch_truncated(Pi)
+function WM_05_epoch_truncated(Pi)
 % epoch data
 % save data in fieldtrip style structure
 %
