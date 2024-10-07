@@ -1,4 +1,4 @@
-function WM_stat_ERSP(trialType, trialSection, channelGroup, doERSPStat)
+function [p_values, excludedIDsStr] = WM_stat_ERSP(trialType, trialSection, channelGroup, doERSPStat)
 
 % trialType = 'learn_stat', 'learn_mobi', 'probe_stat', *probe_mobi'
 % contrast participants versus controls
@@ -10,7 +10,7 @@ function WM_stat_ERSP(trialType, trialSection, channelGroup, doERSPStat)
 %--------------------------------------------------------------------------
 WM_config; 
 pThreshold      = 0.025; 
-nPermutations   = 2000; 
+nPermutations   = 5000; 
 
 % Load data
 %--------------------------------------------------------------------------
@@ -26,8 +26,8 @@ freqPoints = ERSP.freq;
 patientIDs      = 81001:81011; 
 controlIDs      = [82001:82011, 83001:83011, 84009];
 excludedIDs     = [81005, 82005, 83005 ...      % 81005 and matched controls excluded due to psychosis
-                   81008, 82008, 83008 ...      % 81008 and matched controls excluded due to extensive spectral artefacts in data
-                   82009 ];                     % 82009 nausea              
+                   82009];                     % 82009 nausea              
+
 controlIDs      = setdiff(controlIDs, excludedIDs); 
 patientIDs      = setdiff(patientIDs, excludedIDs); 
 
@@ -87,11 +87,6 @@ for Pi = patientIDs
     end
 end
 
-% save summary of all patients data 
-save(fullfile(config_folder.results_folder, config_folder.band_powers_folder, ['MTLR_average_' trialType '_' trialSection '_' channelGroup.key config_folder.bandPowerFileName]), 'bandpowersp')
-       
-
-
 for Pi = controlIDs
     try
         ERSPvar         = load(['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\ERSP_pruned\sub-' num2str(Pi) '\sub-' num2str(Pi) '_' trialType '_' channelGroup.key '_' trialSection '_ERSP_pruned.mat']);    
@@ -140,9 +135,40 @@ for Pi = controlIDs
     end
 end
 
+
+mergedpowers    = [bandpowersp; bandpowersc]; 
+mergedIDs       = [patientIDs, controlIDs];
+ind = util_WM_IQR(log(mean(mergedpowers,2)));
+figure; 
+subplot(1,2,1)
+imagesc(mergedpowers); colorbar; 
+title([trialType '_' trialSection '_' channelGroup.key ' all'], 'Interpreter', 'none')
+subplot(1,2,2)
+exc                = mergedpowers; 
+exc(ind,:)         =  []; 
+imagesc(exc); colorbar; 
+excIDs = mergedIDs(ind);  % Get the IDs of excluded participants
+excludedIDsStr = num2str(excIDs, '%d ');
+title([trialType '_' trialSection '_' channelGroup.key ' excluding ' excludedIDsStr], 'Interpreter', 'none')
+
+[~, indexp] = ismember(excIDs, patientIDs); 
+indexp(indexp == 0) = [];
+bandpowersp(indexp,:)       = NaN;
+[~, indexc] = ismember(excIDs, controlIDs); 
+indexc(indexc == 0) = [];
+bandpowersc(indexc,:)       = NaN;
+
 % save summary of all patients data 
+save(fullfile(config_folder.results_folder, config_folder.band_powers_folder, ['MTLR_average_' trialType '_' trialSection '_' channelGroup.key config_folder.bandPowerFileName]), 'bandpowersp')
 save(fullfile(config_folder.results_folder, config_folder.band_powers_folder, ['CTRL_average_' trialType '_' trialSection '_' channelGroup.key config_folder.bandPowerFileName]), 'bandpowersc')
-      
+
+if numel(indexp) > 0 
+   ERSPp(indexp) = [];  
+end
+
+if numel(indexc) > 0 
+   ERSPc(indexc) = [];  
+end
 
 pMat    = cat(3,ERSPp{:});
 cMat    = cat(3,ERSPc{1:numel(ERSPc)});
@@ -158,12 +184,12 @@ if doERSPStat
         lims = [0,1.2];
     end
     
-    util_WM_plot_ERSP(ERSPp, timePoints, freqPoints, ['ERSP_MTL_' trialType '_' channelGroup.key '_' trialSection], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
-    util_WM_plot_ERSP(ERSPc, timePoints, freqPoints, ['ERSP_CTRL_' trialType '_' channelGroup.key '_' trialSection], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\ERSP\aggregated_ERSP_ctrl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
-    
+%     util_WM_plot_ERSP(ERSPp, timePoints, freqPoints, ['ERSP_MTL_' trialType '_' channelGroup.key '_' trialSection], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\ERSP\aggregated_ERSP_mtl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
+%     util_WM_plot_ERSP(ERSPc, timePoints, freqPoints, ['ERSP_CTRL_' trialType '_' channelGroup.key '_' trialSection], ['P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\ERSP\aggregated_ERSP_ctrl_' trialType '_' channelGroup.key '_' trialSection '.png'], [], lims)
+     
     sigClusters = find(p_values < 0.05);
     
-    for Ci = 1; % sigClusters
+    for Ci = sigClusters
         
         disp([num2str(Ci) ' out of ' num2str(numel(sigClusters)) ' significant cluster found'])
         mask = clusters{Ci};
@@ -171,107 +197,8 @@ if doERSPStat
         
     end
     
-    disp(['ERSP sig cluster p = ' num2str(p_values(1))])
+    disp(['ERSP sig cluster p = ' num2str(p_values(1)) ', ERSP_' trialType '_' channelGroup.key '_' trialSection])
 end
-
-% Participant versus control spectra 
-%--------------------------------------------------------------------------
-f = figure; 
-%subplot(1,2,1)
-this = mean(pMat, 2); pSpectra = squeeze(this);
-this2 = mean(pMat, [2,3]); pSpectraMean = squeeze(this2);
-that = mean(cMat, 2); cSpectra = squeeze(that);
-that2 = mean(cMat, [2,3]); cSpectraMean = squeeze(that2);
-
-% Assuming you have pSpectra and cSpectra matrices
-% Calculate the mean and standard error for each frequency
-mean_pSpectra   = pSpectraMean';
-std_pSpectra    = nanstd(pSpectra', 1);
-mean_cSpectra   = cSpectraMean';
-std_cSpectra    = nanstd(cSpectra', 1);
-
-% Define the x-axis (frequencies)
-frequencies = 1:size(pSpectra, 1); % You may need to adjust this based on your data
-
-% Plot the mean lines
-plot(frequencies, mean_pSpectra, 'LineWidth', 3, 'Color', config_visual.pColor);
-hold on;
-plot(frequencies, mean_cSpectra, 'LineWidth', 3, 'Color', config_visual.cColor);
-
-% Plot the confidence intervals as filled areas
-x = [frequencies, fliplr(frequencies)]; % x values for filling
-y_p = [mean_pSpectra + std_pSpectra, fliplr(mean_pSpectra - std_pSpectra)]; % y values for filling
-fill(x, y_p, config_visual.pColor, 'FaceAlpha', 0.2, 'EdgeColor', 'none'); % Fill confidence interval area for pSpectra
-
-y_c = [mean_cSpectra + std_cSpectra, fliplr(mean_cSpectra - std_cSpectra)]; % y values for filling
-fill(x, y_c, config_visual.cColor, 'FaceAlpha', 0.2, 'EdgeColor', 'none'); % Fill confidence interval area for cSpectra
-
-% %grid on; 
-
-%xlabel('frequencies in Hz')
-%ylabel('trial power / baseline')
-%title(['Power ratio ' trialType ', ' channelGroup.key ', ' trialSection], 'Interpreter', 'none')
-if contains(trialType, 'mobi')
-    ylim([0 20])
-else
-    ylim([-0.5 3])
-end
-
-set(gcf,'Position',[300 300 500 800])
-set(gca,'fontsize',20)
-set(gca,'Xscale','log')
-
-xticks([1 6 10 18 28 58])
-xticklabelsCell = arrayfun(@num2str, [3 8 12 20 30 60], 'UniformOutput', false);
-xticklabels(xticklabelsCell);
-
-if ~strcmp(trialSection,'Start')
-    set(gca, 'YColor','none')
-end
-saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '_narrow.png']))
-saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '_narrow.svg']))
-
-
- 
-% % Band power 
-% %--------------------------------------------------------------------------
-% subplot(1,2,2) 
-% dataBoxPlot                             = nan(numel(config_param.band_names),2,30);
-% dataBoxPlot(:,1,1:size(bandpowersp,1))  = bandpowersp';
-% dataBoxPlot(:,2,1:size(bandpowersc,1))  = bandpowersc';
-% boxplot2(dataBoxPlot); 
-% 
-% h =  findobj(gca,'Tag','Box');
-% 
-% for j=1:length(h)
-% 
-%     if mod(j,2) == 1
-%         color = config_visual.cColor;
-%     else
-%         color = config_visual.pColor;
-%     end
-%     
-%     patch(get(h(j),'XData'),get(h(j),'YData'),color,'FaceAlpha',.8, 'EdgeColor','w');
-%     
-% end
-% 
-% xticks([1,2,3,4])
-% xticklabels({'theta','alpha','beta','gamma'})
-% set(gcf,'Position',[300 300 1500 800])
-% set(gca,'fontsize',15)
-% 
-% if contains(trialType, 'mobi')
-%     ylim([0 20])
-% else
-%     ylim([-0.5 3])
-% end
-% 
-% saveas(f, fullfile(config_folder.figures_folder, [trialType '_' channelGroup.key '_' trialSection '.png']))
-% 
-% for Bi = 1:numel(config_param.band_names)
-%     [~, pval] = ttest2(bandpowersp(:,Bi), bandpowersc(:,Bi)); 
-%     disp([config_param.band_names{Bi} ', ' trialType ', ' trialSection ', ' channelGroup.key ' band powers, p = ' num2str(pval)])
-% end
 
 
 end
