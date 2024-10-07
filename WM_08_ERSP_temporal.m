@@ -22,17 +22,11 @@ ERSPLearnM = load(fullfile(erspFileDir, [erspFileName '_learn_mobi_' elecGroup.k
 ERSPProbeS = load(fullfile(erspFileDir, [erspFileName '_probe_stat_' elecGroup.key '_ERSP.mat']), 'ERSPcorr');
 ERSPProbeM = load(fullfile(erspFileDir, [erspFileName '_probe_mobi_' elecGroup.key '_ERSP.mat']), 'ERSPcorr');
 
-% stupid but pull the struct field up as a variable
-ERSPLearnS = ERSPLearnS.ERSPcorr; 
-ERSPLearnM = ERSPLearnM.ERSPcorr; 
-ERSPProbeS = ERSPProbeS.ERSPcorr; 
-ERSPProbeM = ERSPProbeM.ERSPcorr; 
-
 %% Analysis of the start and end of trials
-util_WM_cut_windows(ERSPLearnS, 3, Pi, ['learn_stat_' elecGroup.key]);
-util_WM_cut_windows(ERSPLearnM, 3, Pi, ['learn_mobi_' elecGroup.key]);
-util_WM_cut_windows(ERSPProbeS, 3, Pi, ['probe_stat_' elecGroup.key]);
-util_WM_cut_windows(ERSPProbeM, 3, Pi, ['probe_mobi_' elecGroup.key]);
+util_WM_cut_windows(ERSPLearnS.ERSPcorr, 3, Pi, ['learn_stat_' elecGroup.key]);
+util_WM_cut_windows(ERSPLearnM.ERSPcorr, 3, Pi, ['learn_mobi_' elecGroup.key]);
+util_WM_cut_windows(ERSPProbeS.ERSPcorr, 3, Pi, ['probe_stat_' elecGroup.key]);
+util_WM_cut_windows(ERSPProbeM.ERSPcorr, 3, Pi, ['probe_mobi_' elecGroup.key]);
 
 
 end
