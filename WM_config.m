@@ -20,8 +20,8 @@ config_folder.preprocessed_folder      = '3_preprocessed';
 config_folder.spatial_filters_folder    = '4_spatial-filters'; 
 config_folder.postAMICA_folder         = '5_post-AMICA'; 
     config_folder.postAMICAFileName           = '_preprocessed_and_ICA.set';                       
-config_folder.cleaned_folder           = '6_cleaned'; 
-    config_folder.cleanedFileName             = '_cleaned.set';       
+config_folder.cleaned_folder           = '5_post-AMICA'; 
+    config_folder.cleanedFileName             = '_cleaned_with_ICA.set';       
 config_folder.epoched_folder           = '7_epoched';                       % from here on .set is not used anymore and mainly fieldtrip is used                 
     config_folder.epochedFileName         = '_epoched.mat';
     
@@ -35,6 +35,7 @@ config_folder.beh_folder            = 'BEH_output';
 config_folder.spatial_overlay_folder  = 'spatial_overlay'; 
 config_folder.spatial_overlay_target_folder  = 'spatial_overlay_target'; 
 config_folder.spatial_dist_folder   = 'spatial_dist'; 
+config_folder.spatial_av_folder     = 'angular_velocity'; 
 config_folder.pruned_ERSP_folder    = 'ERSP_pruned'; 
 config_folder.band_powers_folder    = 'Band_powers';
     config_folder.bandPowerFileName = '_band_powers.mat'; 
@@ -43,13 +44,11 @@ config_folder.band_powers_folder    = 'Band_powers';
 %% Parameters 
 % IC cleaning 
 %--------------------------------------------------------------------------
-config_param.IC_threshold    = 0.8; 
+config_param.IC_threshold    = 0.7; 
 
 % Beamforming 
 %--------------------------------------------------------------------------
-config_param.ROI_names       = {'RSC', 'Prefrontal_cortex'};
-config_param.FOI_lower       = [4,  8,  12, 30];
-config_param.FOI_upper       = [8,  12, 30, 60]; 
+%config_param.ROI_names       = {'RSC', 'Prefrontal_cortex'};
 
 % Behavioral anaylsis 
 %--------------------------------------------------------------------------
@@ -57,12 +56,15 @@ config_param.memscore_iterations = [];
 
 % ERSP analysis
 %--------------------------------------------------------------------------
-config_param.ERSP_freq_range = [3,60];
+config_param.ERSP_freq_range = [3,90];
 
 % Band definition 
 %--------------------------------------------------------------------------
-config_param.band_names     = {'theta', 'alpha', 'beta', 'gamma'};  
-config_param.band_bounds    = [4,8;  8,12;  12,30;  30,60];         % a vector of 2 X number of fBands; 
+config_param.band_names     = {'theta', 'alpha', 'beta', 'gamma', 'high gamma'};  
+config_param.band_bounds    = [4,8;  8,12;  12,30;  30,60; 60, 90];         % a vector of 2 X number of fBands; 
+config_param.FOI_lower       = [4,  8,  12, 30, 60];
+config_param.FOI_upper       = [8,  12, 30, 60, 90]; 
+
 
 load('ExampleChanLoc.mat', 'exampleChanLoc'); % only load to match channel names with channel indices
 chanLabels                  = {exampleChanLoc.labels}; 
@@ -94,7 +96,7 @@ config_param.chanGroups(4).full_name     = 'Right-temporal';
 %config_param.chanGroups(4).standard_names  = {'FT8', 'TP8', 'T8'};
 config_param.chanGroups(4).chan_names    = {'g24','y20', 'r18', 'r20'}; 
 
-% 
+
 % for Gi = 2:numel(config_param.chanGroups)
 %     for Si = 1:numel(config_param.chanGroups(Gi).standard_names)
 %         sInd = find(strcmp(sElec.label, config_param.chanGroups(Gi).standard_names{Si}));
@@ -119,9 +121,6 @@ end
 
 
 %% Colors 
-config_visual.pColor = [8,97,89]/225; 
-config_visual.cColor = [120, 120, 120]/225; 
-
-
-
+config_visual.pColor = [0.1412, 0.2980, 0.5765]; 
+config_visual.cColor = [0.7725, 0.4667, 0.1255]; 
 
