@@ -19,31 +19,31 @@ end
 ERSPStart       = ERSP; 
 ERSPEnd         = ERSP; 
 ERSPMid         = ERSP; 
-sizeVec                 = size(ERSP.powspctrm);
-numSamples              = sRate*winWidth; 
+sizeVec         = size(ERSP.powspctrm);
+numSamples      = sRate*winWidth; 
 
 % onset window 
 %--------------------------------------------------------------------------
 onsetStartIndex         = find(-1 < ERSP.time, 1, 'first'); 
-ERSPStart.powspctrm     = ERSP.powspctrm(:,:,:,onsetStartIndex:onsetStartIndex + numSamples -1);
+ERSPStart.powspctrm     = ERSP.powspctrm(:,:,onsetStartIndex:onsetStartIndex + numSamples -1);
 ERSPStart.time          = ERSP.time(onsetStartIndex:onsetStartIndex + numSamples -1);
 
 % offset window
 %--------------------------------------------------------------------------
 tLengths                = [];
-ERSPEnd.powspctrm       = NaN(sizeVec(1), sizeVec(2), sizeVec(3) ,numSamples);
+ERSPEnd.powspctrm       = NaN(sizeVec(1), sizeVec(2) ,numSamples);
 for Ti = 1:size(ERSP.powspctrm, 1)
-    dataRow                         = ERSP.powspctrm(Ti,1,1,:);
+    dataRow                         = ERSP.powspctrm(Ti,1,:);
     dataRow                         = squeeze(dataRow);
     tLengths(end+1)                 = find(~isnan(dataRow),1,'last');
     offsetEndIndex                  = tLengths(end);
-    ERSPEnd.powspctrm(Ti,:,:,:)     = ERSP.powspctrm(Ti,:,:,offsetEndIndex-numSamples+1:offsetEndIndex);
+    ERSPEnd.powspctrm(Ti,:,:)       = ERSP.powspctrm(Ti,:,offsetEndIndex-numSamples+1:offsetEndIndex);
 end
 ERSPEnd.time            = ERSP.time(offsetEndIndex-numSamples+1:offsetEndIndex)- ERSP.time(offsetEndIndex) +1; 
 
 % middle section 
 %--------------------------------------------------------------------------
-ERSPMid.powspctrm       = NaN(sizeVec(1), sizeVec(2), sizeVec(3) ,numSamples);
+ERSPMid.powspctrm       = NaN(sizeVec(1), sizeVec(2),numSamples);
 
 for Ti = 1:size(ERSP.powspctrm, 1)
     
@@ -52,15 +52,15 @@ for Ti = 1:size(ERSP.powspctrm, 1)
     
     % a trial can have multiple windows
     if nWinds ==  0 % if a trial is too short, just use the center window even if it spans a bit on start and end time windows
-        ERSPMid.powspctrm(Ti,:,:,:)     = ERSP.powspctrm(Ti,:,:,round((tLengths(Ti)- numSamples)/2):round((tLengths(Ti) - numSamples)/2) + numSamples - 1);
+        ERSPMid.powspctrm(Ti,:,:)     = ERSP.powspctrm(Ti,:,round((tLengths(Ti)- numSamples)/2):round((tLengths(Ti) - numSamples)/2) + numSamples - 1);
     else 
-        ERSPsInTrial = NaN([nWinds,size(ERSP.powspctrm,2),size(ERSP.powspctrm,3),numSamples]);
+        ERSPsInTrial = NaN([nWinds,size(ERSP.powspctrm,2),numSamples]);
         for Wi = 1:nWinds
             winStartInd = round((tLengths(Ti) - numSamples*nWinds)/2) + numSamples*(Wi-1);
             winEndInd   = round((tLengths(Ti) - numSamples*nWinds)/2) + numSamples*Wi-1; 
-            ERSPsInTrial(Wi,:,:,:) = ERSP.powspctrm(Ti,:,:,winStartInd:winEndInd);
+            ERSPsInTrial(Wi,:,:) = ERSP.powspctrm(Ti,:,winStartInd:winEndInd);
         end
-        ERSPMid.powspctrm(Ti,:,:,:)     = mean(ERSPsInTrial,1, 'omitnan');
+        ERSPMid.powspctrm(Ti,:,:)     = mean(ERSPsInTrial,1, 'omitnan');
     end
     
 end
@@ -98,7 +98,21 @@ cfg.figure      = 'gcf';
 % end
 
 f = figure; 
-cfg.trials      = 'all';
+cfg.trials          = 'all';
+ERSPStart.label     = {condText(end-1:end)};
+ERSPMid.label       = {condText(end-1:end)};
+ERSPEnd.label       = {condText(end-1:end)};
+
+% Add a new dimension to powspctrm for channel
+% Add a new dimension to powspctrm for ERSPStart
+ERSPStart.powspctrm = reshape(ERSPStart.powspctrm, [size(ERSPStart.powspctrm, 1), 1, size(ERSPStart.powspctrm, 2), size(ERSPStart.powspctrm, 3)]);
+ERSPMid.powspctrm = reshape(ERSPMid.powspctrm, [size(ERSPMid.powspctrm, 1), 1, size(ERSPMid.powspctrm, 2), size(ERSPMid.powspctrm, 3)]);
+ERSPEnd.powspctrm = reshape(ERSPEnd.powspctrm, [size(ERSPEnd.powspctrm, 1), 1, size(ERSPEnd.powspctrm, 2), size(ERSPEnd.powspctrm, 3)]);
+
+ERSPStart.dimord = 'rpt_chan_freq_time';
+ERSPMid.dimord = 'rpt_chan_freq_time';
+ERSPEnd.dimord = 'rpt_chan_freq_time';
+
 
 subplot(1,2,1)
 ft_singleplotTFR(cfg, ERSPStart);

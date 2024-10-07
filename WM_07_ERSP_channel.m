@@ -24,30 +24,11 @@ freqRange                   = config_param.ERSP_freq_range;
 util_WM_plot_trial_lengths(ERSPLearnSRaw, ERSPLearnMRaw, ERSPProbeSRaw, ERSPProbeMRaw, Pi); 
 
 %% Baseline correction 
-% compute baseline 
-[ERSPStandBaseMOBI]     = util_WM_ERSP(elecGroup.chan_names, 'stand', 'stat', Pi, freqRange);
-[ERSPStandBaseSTAT]     = util_WM_ERSP(elecGroup.chan_names, 'stand', 'mobi', Pi, freqRange);
-[ERSPWalkBaseMOBI]      = util_WM_ERSP(elecGroup.chan_names, 'walk', 'stat', Pi, freqRange);
-[ERSPWalkBaseSTAT]      = util_WM_ERSP(elecGroup.chan_names, 'walk', 'mobi', Pi, freqRange);
-
-[baseFileName,baseFileDir] = assemble_file(config_folder.results_folder, [config_folder.ersp_folder '_base'], '_base_ERSP.mat', Pi);
-
-if ~isfolder(baseFileDir)
-    mkdir(baseFileDir)
-end
-
-% save data from baseline 
-save(fullfile(baseFileDir, baseFileName), 'ERSPStandBaseMOBI', 'ERSPStandBaseSTAT', 'ERSPWalkBaseMOBI', 'ERSPWalkBaseSTAT',  '-v7.3'); 
-
-% compare walking baseline activity against standing baseline
-util_WM_basecorrect(ERSPWalkBaseSTAT, ERSPStandBaseSTAT, Pi, ['walk_versus_stand_stat_', elecGroup.key]);
-util_WM_basecorrect(ERSPWalkBaseMOBI, ERSPStandBaseMOBI, Pi, ['walk_versus_stand_mobi_', elecGroup.key]);
-
 % correct trial data using common baseline
-util_WM_basecorrect(ERSPLearnSRaw, ERSPWalkBaseSTAT, Pi, ['learn_stat_', elecGroup.key]);
-util_WM_basecorrect(ERSPLearnMRaw, ERSPWalkBaseMOBI, Pi, ['learn_mobi_', elecGroup.key]);
-util_WM_basecorrect(ERSPProbeSRaw, ERSPWalkBaseSTAT, Pi, ['probe_stat_', elecGroup.key]);
-util_WM_basecorrect(ERSPProbeMRaw, ERSPWalkBaseMOBI, Pi, ['probe_mobi_', elecGroup.key]);
+util_WM_basecorrect(ERSPLearnSRaw, 'stat', Pi, ['learn_stat_', elecGroup.key]);
+util_WM_basecorrect(ERSPLearnMRaw, 'mobi', Pi, ['learn_mobi_', elecGroup.key]);
+util_WM_basecorrect(ERSPProbeSRaw, 'stat', Pi, ['probe_stat_', elecGroup.key]);
+util_WM_basecorrect(ERSPProbeMRaw, 'mobi', Pi, ['probe_mobi_', elecGroup.key]);
 
 
 end

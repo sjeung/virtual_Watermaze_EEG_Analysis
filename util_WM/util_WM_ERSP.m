@@ -10,7 +10,6 @@ end
 
 % load data
 load(fullfile(epochedFileDir, epochedFileName), 'ftEEG');
-EEG = ftEEG;
 
 cfg                     = [];
 cfg.output              = 'pow';
@@ -24,14 +23,8 @@ cfg.pad                 = 'nextpow2';
 cfg.padratio            = 4;
 cfg.baseline            = NaN;
 cfg.datatype            = 'raw';
-
-if iscell(elecNames)&& ~contains(trialType, 'stand') && ~contains(trialType, 'walk') 
-    cfg.keeptrials      = 'yes';
-else
-    cfg.keeptrials      = 'no'; 
-end
-
-ERSP                    = ft_freqanalysis(cfg, EEG);
+cfg.keeptrials          = 'yes';
+ERSP                    = ft_freqanalysis(cfg, ftEEG);
 
 
 end
