@@ -28,6 +28,32 @@ ERSPPM          = ERSPProbeM.(vn);
 fn              = fieldnames(ERSPProbeE);  vn = fn{1};
 ERSPPE          = ERSPProbeE.(vn);
 
+% multiple channel data have been averaged together 
+% insert a dimension just for getting downstream functions to work 
+ERSPLS.label    = {channelGroup.key}; 
+ERSPLM.label    = {channelGroup.key}; 
+ERSPLE.label    = {channelGroup.key}; 
+ERSPPS.label    = {channelGroup.key}; 
+ERSPPM.label    = {channelGroup.key}; 
+ERSPPE.label    = {channelGroup.key}; 
+
+ERSPLS.dimord   = 'rpt_chan_freq_time'; 
+ERSPLM.dimord   = 'rpt_chan_freq_time';  
+ERSPLE.dimord   = 'rpt_chan_freq_time';  
+ERSPPS.dimord   = 'rpt_chan_freq_time';  
+ERSPPM.dimord   = 'rpt_chan_freq_time'; 
+ERSPPE.dimord   = 'rpt_chan_freq_time'; 
+
+% Add a new dimension to powspctrm for channel
+% Add a new dimension to powspctrm for ERSPStart
+ERSPLS.powspctrm = reshape(ERSPLS.powspctrm, [size(ERSPLS.powspctrm, 1), 1, size(ERSPLS.powspctrm, 2), size(ERSPLS.powspctrm, 3)]);
+ERSPLM.powspctrm = reshape(ERSPLM.powspctrm, [size(ERSPLM.powspctrm, 1), 1, size(ERSPLM.powspctrm, 2), size(ERSPLM.powspctrm, 3)]);
+ERSPLE.powspctrm = reshape(ERSPLE.powspctrm, [size(ERSPLE.powspctrm, 1), 1, size(ERSPLE.powspctrm, 2), size(ERSPLE.powspctrm, 3)]);
+ERSPPS.powspctrm = reshape(ERSPPS.powspctrm, [size(ERSPPS.powspctrm, 1), 1, size(ERSPPS.powspctrm, 2), size(ERSPPS.powspctrm, 3)]);
+ERSPPM.powspctrm = reshape(ERSPPM.powspctrm, [size(ERSPPM.powspctrm, 1), 1, size(ERSPPM.powspctrm, 2), size(ERSPPM.powspctrm, 3)]);
+ERSPPE.powspctrm = reshape(ERSPPE.powspctrm, [size(ERSPPE.powspctrm, 1), 1, size(ERSPPE.powspctrm, 2), size(ERSPPE.powspctrm, 3)]);
+
+
 % attach trial info to ERSP for later
 ERSPLS.trialinfo  = trialInfoLearn;
 ERSPLM.trialinfo  = trialInfoLearn;
@@ -52,12 +78,18 @@ outInds         = util_WM_IQR([meansLS; meansLM; meansLE; meansPS; meansPM; mean
 
 outCell          = {};
 for cInd = 1:6
+    
     outCell{cInd}    = matchVec(outInds == 1 & matchVec(:,1) == cInd,2);     
     
     % for LS, LM, LE conditions, remove first learning trials
     if cInd < 4
-        outCell{cInd} = union(outCell{cInd}, [1,4,7,10,13,16]); 
+        if Pi == 83004 && strcmp(sessionType, 'mobi')
+            outCell{cInd} = union(outCell{cInd}, [1,4,7,10]);
+        else
+            outCell{cInd} = union(outCell{cInd}, [1,4,7,10,13,16]);
+        end
     end
+    
 end
  
 % remove outliers from ERSP fields
