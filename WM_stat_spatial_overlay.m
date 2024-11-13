@@ -98,7 +98,7 @@ ERSPcn  = nanmedian(overlayC, 3);
 if contains(trialType, 'stat')
     climUpper               = 1;
 else
-    climUpper               = 8;
+    climUpper               = 2;
 end
 
 figure; subplot(1,2,1); 

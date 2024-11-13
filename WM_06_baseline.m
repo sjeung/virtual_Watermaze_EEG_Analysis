@@ -28,13 +28,13 @@ for Ti = 1:2
         powers      = mean(ERSPIQR.powspctrm, [2,3,4],'omitnan');
         [excInds]   = util_WM_IQR(powers);
         excTrials   = find(excInds);
-        allTrials  = 1:numel(powers);
+        allTrials   = 1:numel(powers);
         keepTrials  = setdiff(allTrials, excTrials);
         
         % average across trials again
-        cfg         = [];
-        cfg.trials  = keepTrials;
-        ERSPIQR     = ft_selectdata(cfg, ERSPIQR);
+        cfg                 = [];
+        cfg.trials          = keepTrials;
+        ERSPIQR             = ft_selectdata(cfg, ERSPIQR);
         ERSPIQR.powspctrm   = squeeze(mean(ERSPIQR.powspctrm, 1,'omitnan'));
         ERSPIQR.cumtapcnt   = squeeze(mean(ERSPIQR.cumtapcnt, 1,'omitnan'));
         ERSPIQR.dimord      = 'chan_freq_time';
