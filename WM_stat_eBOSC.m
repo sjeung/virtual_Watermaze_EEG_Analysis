@@ -163,11 +163,6 @@ for Fi = 1:numel(config_param.band_names)
     Fs(2, Fi)               = groupFs;
     Fs(3, Fi)               = setupFs;
     
-    if interactionPValue < 0.05
-      %  disp(['Interaction p = ' num2str(interactionPValue) ' in ' trial ', ' chanGroup.key ', ' config_param.band_names{Fi} ' band, '  timeWindow]);
-      %  disp(['Group p = ' num2str(groupPValue) ', setup p = ' num2str(setupPValue)]);
-    end
-    
 end
 
 if strcmp(parameter, 'pepisodes')
@@ -182,7 +177,7 @@ subplot(1,2,1)
 pMat = parameterVec(1:10,:);
 cMat = parameterVec(11:30,:);
 allData = [pMat; cMat];
-positions = [repmat(1:2:9, size(pMat, 1), 1); repmat(2:2:10, size(cMat, 1), 1)];
+positions = [repmat(1:2:9, size(pMat, 1), 1); repmat(2:2:10, size(cMat,1), 1)]; 
 positions = positions(:);
 boxplot(allData, positions, 'Colors', 'k', 'Symbol', '');
 hold on;
@@ -190,7 +185,7 @@ for i = 1:5
     scatter(repmat(i * 2 - 1, size(pMat, 1), 1), pMat(:, i), 30, config_visual.pColor, 'filled', 'jitter', 'on', 'jitterAmount', 0.1);
     scatter(repmat(i * 2, size(cMat, 1), 1), cMat(:, i), 30, config_visual.cColor, 'filled', 'jitter', 'on', 'jitterAmount', 0.1);
 end
-set(gca, 'XTick', 1.5:2:9.5, 'XTickLabel', groupLabels, 'FontSize', 10); 
+set(gca, 'XTick', 1.5:2:11.5, 'XTickLabel', groupLabels, 'FontSize', 10); 
 ylabel(['Mean ' parameter]); 
 ylim(ylims); 
 title([parameter ', stat, ' chanGroup.key], 'Interpreter', 'none');
@@ -207,14 +202,12 @@ for i = 1:5  % Loop through each frequency band (5 bands)
     scatter(repmat(i * 2 - 1, size(pMat, 1), 1), pMat(:, i), 30, config_visual.pColor, 'filled', 'jitter', 'on', 'jitterAmount', 0.1);
     scatter(repmat(i * 2, size(cMat, 1), 1), cMat(:, i), 30, config_visual.cColor, 'filled', 'jitter', 'on', 'jitterAmount', 0.1);
 end
-set(gca, 'XTick', 1.5:2:9.5, 'XTickLabel', groupLabels, 'FontSize', 10); 
+set(gca, 'XTick', 1.5:2:11.5, 'XTickLabel', groupLabels, 'FontSize', 10); 
 ylabel(['Mean ' parameter]); 
 ylim(ylims); 
 title([parameter ', mobile, ' chanGroup.key], 'Interpreter', 'none');
 grid on; hold off;
 
 saveas(f, fullfile(config_folder.figures_folder, 'bosc_stat', ['BOSC_' parameter '_' trial '_' chanGroup.key  '_' timeWindow '.png']));
-
-
 save(fullfile('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\BOSC', ['BOSC-comp_' trial '_' timeWindow '_' chanGroup.key '.mat']), 'pEpisodesVec', 'bandpowerVec', 'freqAxis', 'omegaSquareds', 'Fs');
 end
