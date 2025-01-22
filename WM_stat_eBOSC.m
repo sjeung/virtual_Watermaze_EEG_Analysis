@@ -1,4 +1,8 @@
-function [pValVec, omegaSquareds, Fs] = WM_stat_eBOSC(trial, timeWindow, chanGroup, parameter)
+function [pValVec, omegaSquareds, Fs, postP, postFs, postDF1, postDF2] = WM_stat_eBOSC(trial, timeWindow, chanGroup, parameter, runPosthoc)
+
+if ~exist('runPosthoc','var')
+    runPosthoc = false;
+end
 
 if strcmp(parameter, 'pepisodes')   
     ylims = [0 0.7]; 
@@ -6,12 +10,14 @@ else
     ylims = [2 6]; 
 end
 
-
 % 3 p values (interaction, group, setup) and 5 tests
 pValVec                 = NaN(3,5);
 omegaSquareds           = NaN(3,5);
 Fs                      = NaN(3,5);
 
+% post-hoc results 
+postP = NaN(4,5); postFs = NaN(4,5); postDF1 = NaN(4,5); postDF2 = NaN(4,5); 
+        
 
 if strcmp(trial, 'stand') ||  strcmp(trial, 'walk')
     isBaseline = 1; 
@@ -135,7 +141,6 @@ for Fi = 1:numel(config_param.band_names)
     SS_Interaction = (lme.Coefficients.Estimate(strcmp(lme.Coefficients.Name, 'Group_2:Setup_2'))^2) * ...
         lme.Coefficients.DF(strcmp(lme.Coefficients.Name, 'Group_2:Setup_2'));
     
-    
     % Mean square error (MS_error)
     MS_error = lme.MSE;  % This is the residual mean square
     
@@ -162,6 +167,26 @@ for Fi = 1:numel(config_param.band_names)
     Fs(1, Fi)               = interactionFs;
     Fs(2, Fi)               = groupFs;
     Fs(3, Fi)               = setupFs;
+    
+    if runPosthoc
+              
+        ct = {}; 
+       
+        % Post-hoc test for Group × Setup interaction
+        ct{1} = [ 0 0 0 0 0 0 0 0;        
+                0 0 1 0 0 0 0 0; ];
+        ct{2} = [ 1 0 0 0 0 0 0 0;        
+                0 1 1 0 0 0 0 0; ];
+        ct{3} = [ 0 0 0 0 0 0 0 0;       
+                0 1 0 0 0 0 0 0; ];
+        ct{4} = [ 0 1 1 0 0 0 0 0;       
+                0 1 1 0 0 0 0 0; ];
+        
+        % Run the post-hoc test
+        for Icont = 1:4
+            [postP(Icont, Fi), postFs(Icont, Fi), postDF1(Icont, Fi), postDF2(Icont, Fi)] = coefTest(lme, ct{Icont});
+        end
+    end
     
 end
 

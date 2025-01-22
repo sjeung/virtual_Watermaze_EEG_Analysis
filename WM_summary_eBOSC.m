@@ -71,11 +71,10 @@ results_bosc    = [results_bosc; newRows];
 
 effectTexts = {'groupXsetup interaction', 'group', 'setup'};  
 tasks           = {'stand', 'walk', 'probe'};
-for measureInd = 1:2
-    
+for measureInd = 2%1:2
     % baseline tasks
     for taskInd = 1:2
-        for effectInd = 1:3
+        for effectInd = 1:2
             results_temp            = results_bosc(find(strcmp(results_bosc.measure, measures{measureInd}) & strcmp(results_bosc.task, tasks{taskInd}) & strcmp(results_bosc.contrast, effectTexts{effectInd})),:);
             pVals                   = results_temp.p;
             [h,~,~,corrPs]          = fdr_bh(pVals);
@@ -92,7 +91,7 @@ for measureInd = 1:2
     % main task
     taskInd = 3;
     for windowInd = 1:3
-        for effectInd = 1:3
+        for effectInd = 1:2
             results_temp =  results_bosc(find(strcmp(results_bosc.measure, measures{measureInd}) & strcmp(results_bosc.twindow, windowTypes{windowInd}) & strcmp(results_bosc.task, tasks{taskInd}) & strcmp(results_bosc.contrast, effectTexts{effectInd})),:);
             pVals = results_temp.p;
             [h,~,~,corrPs]       = fdr_bh(pVals);
@@ -103,25 +102,51 @@ for measureInd = 1:2
             
             % replace p value with corrected values
             results_bosc(find(strcmp(results_bosc.measure, measures{measureInd}) & strcmp(results_bosc.twindow, windowTypes{windowInd}) & strcmp(results_bosc.task, tasks{taskInd}) & strcmp(results_bosc.contrast, effectTexts{effectInd})),:).corrected_p = corrPs;
-            
+           
         end
     end
 end
-
-%save('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat', "results_bosc"); 
 
 results_bosc.p = round(results_bosc.p, 3);  % Round values to 3 decimal places
 results_bosc.omegasquared = round(results_bosc.omegasquared, 3);
 results_bosc.F = round(results_bosc.F, 3);
 results_bosc.corrected_p = round(results_bosc.corrected_p, 3);
+
+% Post-hoc tests for interactions
+%--------------------------------------------------------------------------
+effectInd = 1; contNames = {'Setup effect in MTLR', 'Setup effect in CTRL', 'Group effect in stationary', 'Group effect in mobile'};
+for measureInd = 1:2
+    for taskInd = 1:3
+        results_temp            = results_bosc(find(strcmp(results_bosc.measure, measures{measureInd}) & strcmp(results_bosc.task, tasks{taskInd}) & strcmp(results_bosc.contrast, effectTexts{effectInd})),:);
+        interInds               = find(results_temp.corrected_p <= 0.05)';
+        
+        for iI = interInds
+            disp(['Post-hoc test for group X setup interaction in ' tasks{taskInd} ' task, ' results_temp.changroup{iI} ', ' results_temp.frequency{iI}])
+                
+            Gi = find(strcmp({config_param.chanGroups.key}, results_temp.changroup{iI}));
+            Fi = find(strcmp(config_param.band_names, results_temp.frequency{iI}));
+            if taskInd < 3 % baseline task
+                [~,~,~,postP, postFs, postDF1, postDF2] = WM_stat_eBOSC(tasks{taskInd}, '', config_param.chanGroups(Gi), measures{measureInd}, true); % last input is boolean "runPosthoc"
+            elseif taskInd == 3 % main task
+                [~,~,~,postP, postFs, postDF1, postDF2] = WM_stat_eBOSC(tasks{taskInd}, results_temp.twindow{iI}, config_param.chanGroups(Gi), measures{measureInd}, true); % last input is boolean "runPosthoc"
+            end
+            
+            for Icont = 1:4 % bonferroni correction by *4 to P-value
+                if postP(Icont, Fi)*4 <= 0.05
+                    disp([measures{measureInd} ', ' results_temp.twindow{iI} ', ' contNames{Icont} ': p = ' num2str(postP(Icont, Fi)*4, '%.4f') ', F = ' num2str(postFs(Icont, Fi)) ', Df1 = ' num2str(postDF1(Icont, Fi)) ', Df2 = ' num2str(postDF2(Icont, Fi))])
+                end
+            end
+        end
+    end
+end
+
 writetable(results_bosc, 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.xlsx');
+%save('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat', "results_bosc"); 
 %load("P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat"); 
 
 
 % Post-hoc tests on interactions
 %--------------------------------------------------------------------------
-
-
 %%
 %--------------------------------------------------------------------------
 % Correlation with behavior 
