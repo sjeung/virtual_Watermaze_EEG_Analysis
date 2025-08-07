@@ -24,11 +24,11 @@ cfg.eBOSC.fsample       = 250;                          % current sampling frequ
 
 % padding
 cfg.eBOSC.pad.tfr_s         = 0.5;           % padding following wavelet transform to avoid edge artifacts in seconds (bi-lateral)
-cfg.eBOSC.pad.detection_s   = .3;            % padding following rhythm detection in seconds (bi-lateral); 'shoulder' for BOSC eBOSC.detected matrix to account for duration threshold
+cfg.eBOSC.pad.detection_s   = 0.5;           % padding following rhythm detection in seconds (bi-lateral); 'shoulder' for BOSC eBOSC.detected matrix to account for duration threshold
 cfg.eBOSC.pad.background_s  = 0.5;           % padding of segments for BG (only avoiding edge artifacts)
 
 % threshold settings
-cfg.eBOSC.threshold.excludePeak = [];                                       % lower and upper bound of frequencies to be excluded during background fit (Hz) (previously: LowFreqExcludeBG HighFreqExcludeBG)
+cfg.eBOSC.threshold.excludePeak = [];                                       % lower and upperedit bound of frequencies to be excluded during background fit (Hz) (previously: LowFreqExcludeBG HighFreqExcludeBG)
 cfg.eBOSC.threshold.duration	= repmat(2, 1, numel(cfg.eBOSC.F));         % vector of duration thresholds at each frequency (previously: ncyc)
 cfg.eBOSC.threshold.percentile  = .95;                                      % percentile of background fit for power threshold
 
@@ -55,8 +55,8 @@ for Pi = allParticipants
     load(fullfile(fileDir), 'ftEEG');
     
     %% run eBOSC
-    [eBOSC, outConfig]  = eBOSC_wrapper(cfg, ftEEG);
-    eBOSC.config        = outConfig;   
+    [eBOSC, outConfig, TFR]  = eBOSC_wrapper(cfg, ftEEG);
+    eBOSC.config        = outConfig;
     boscOutputs{end+1}  = eBOSC;
 end
 save(fullfile('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\BOSC', ['BOSC_' condString '_' timeWindow '_' chanGroup.key '.mat']), 'boscOutputs', '-v7.3')

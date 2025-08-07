@@ -20,8 +20,8 @@ config_folder.preprocessed_folder      = '3_preprocessed';
 config_folder.spatial_filters_folder    = '4_spatial-filters'; 
 config_folder.postAMICA_folder         = '5_post-AMICA'; 
     config_folder.postAMICAFileName           = '_preprocessed_and_ICA.set';                       
-config_folder.cleaned_folder           = '5_post-AMICA'; 
-    config_folder.cleanedFileName             = '_cleaned_with_ICA.set';       
+config_folder.cleaned_folder           = '6_cleaned'; 
+    config_folder.cleanedFileName             = '_cleaned.set';          
 config_folder.epoched_folder           = '7_epoched';                       % from here on .set is not used anymore and mainly fieldtrip is used                 
     config_folder.epochedFileName         = '_epoched.mat';
     
@@ -61,8 +61,8 @@ config_param.ERSP_freq_range = [3,90];
 % Band definition 
 %--------------------------------------------------------------------------
 config_param.band_names     = {'theta', 'alpha', 'beta', 'gamma', 'high gamma'};  
-config_param.band_bounds    = [4,8;  8,12;  12,30;  30,60; 60, 90];         % a vector of 2 X number of fBands; 
-config_param.FOI_lower       = [4,  8,  12, 30, 60];
+config_param.band_bounds    = [3, 8;  8,12;  12,30;  30,60; 60, 90];         % a vector of 2 X number of fBands; 
+config_param.FOI_lower       = [3,  8,  12, 30, 60];
 config_param.FOI_upper       = [8,  12, 30, 60, 90]; 
 
 
@@ -79,6 +79,7 @@ sElecFile = 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Data\source-data\Eloc and im
 
 config_param.chanGroups(1).key           = 'FM';
 config_param.chanGroups(1).full_name     = 'Frontal-midline';
+%config_param.chanGroups(2).standard_names  = {'Fz', 'F1', 'F2'}; 
 config_param.chanGroups(1).chan_names    = {'y1','y2','y3','y25','y32'}; 
 
 config_param.chanGroups(2).key           = 'PM';

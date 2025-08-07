@@ -12,6 +12,14 @@ measures            = {'powers', 'pepisodes'};
 addpath('P:\Sein_Jeung\Tools\FDR')
 effectTexts = {'groupXsetup interaction', 'group', 'setup'};  
 
+
+% Create tables for R
+WM_table_eBOSC('stand', '')
+WM_table_eBOSC('walk', '')
+WM_table_eBOSC('probe', 'Start')
+WM_table_eBOSC('probe', 'Mid')
+WM_table_eBOSC('probe', 'End')
+
 %%
 %--------------------------------------------------------------------------
 % POWER & P-EPISODES 
@@ -71,10 +79,10 @@ results_bosc    = [results_bosc; newRows];
 
 effectTexts = {'groupXsetup interaction', 'group', 'setup'};  
 tasks           = {'stand', 'walk', 'probe'};
-for measureInd = 2%1:2
+for measureInd = 1:2
     % baseline tasks
     for taskInd = 1:2
-        for effectInd = 1:2
+        for effectInd = 1:3
             results_temp            = results_bosc(find(strcmp(results_bosc.measure, measures{measureInd}) & strcmp(results_bosc.task, tasks{taskInd}) & strcmp(results_bosc.contrast, effectTexts{effectInd})),:);
             pVals                   = results_temp.p;
             [h,~,~,corrPs]          = fdr_bh(pVals);
@@ -91,7 +99,7 @@ for measureInd = 2%1:2
     % main task
     taskInd = 3;
     for windowInd = 1:3
-        for effectInd = 1:2
+        for effectInd = 1:3
             results_temp =  results_bosc(find(strcmp(results_bosc.measure, measures{measureInd}) & strcmp(results_bosc.twindow, windowTypes{windowInd}) & strcmp(results_bosc.task, tasks{taskInd}) & strcmp(results_bosc.contrast, effectTexts{effectInd})),:);
             pVals = results_temp.p;
             [h,~,~,corrPs]       = fdr_bh(pVals);
@@ -141,13 +149,10 @@ for measureInd = 1:2
 end
 
 writetable(results_bosc, 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.xlsx');
-%save('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat', "results_bosc"); 
-%load("P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat"); 
+save('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat', "results_bosc"); 
+% load("P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-bands.mat"); 
 
 
-% Post-hoc tests on interactions
-%--------------------------------------------------------------------------
-%%
 %--------------------------------------------------------------------------
 % Correlation with behavior 
 %--------------------------------------------------------------------------
@@ -169,7 +174,7 @@ for measureInd = 1:2
         %% Main task stats on powers
         %------------------------------------------------------------------
         for Wi = 1:3
-            for Gi = 3%1:4
+            for Gi = 1:4%1:4
                 [pVals, omegasq, Fs] = WM_stat_beh_eeg_BOSC('probe', windowTypes{Wi}, config_param.chanGroups(Gi), behVars{behInd}, measures{measureInd});
                 for effectInd = 1:4
                     for fInd = 1:5
@@ -209,6 +214,35 @@ results_eeg_beh.p = round(results_eeg_beh.p, 3);  % Round values to 3 decimal pl
 results_eeg_beh.omegasquared = round(results_eeg_beh.omegasquared, 3);
 results_eeg_beh.F = round(results_eeg_beh.F, 3);
 results_eeg_beh.corrected_p = round(results_eeg_beh.corrected_p, 3);
+
+% Post-hoc tests for interactions
+%--------------------------------------------------------------------------
+contNames = {'EEG effect in MTLR', 'EEG effect in CTRL', 'EEG effect in stationary', 'EEG effect in mobile', 'EEG MTLR in mobile', 'EEG CTRL in mobile', 'EEG MTLR in stationary', 'EEG CTRL in stationary'};
+for effectInd = 1:3
+    for behInd = 1:2
+        for measureInd = 1:2
+            for taskInd = 1:3
+                results_temp            = results_eeg_beh(find(strcmp(results_eeg_beh.measure, measures{measureInd}) & strcmp(results_eeg_beh.behvar, behVars{behInd}) & strcmp(results_eeg_beh.twindow, windowTypes{windowInd}) & strcmp(results_eeg_beh.task, tasks{taskInd}) & strcmp(results_eeg_beh.contrast, effectTexts{effectInd})),:);
+                interInds               = find(results_temp.corrected_p <= 0.05)';
+                
+                for iI = interInds
+                    disp(['Post-hoc test for ' effectTexts{effectInd} ' in ' tasks{taskInd} ' task, ' results_temp.changroup{iI} ', ' results_temp.frequency{iI}])
+                    Gi = find(strcmp({config_param.chanGroups.key}, results_temp.changroup{iI}));
+                    Fi = find(strcmp(config_param.band_names, results_temp.frequency{iI}));
+                    [~,~,~,postP, postFs, postDF1, postDF2] = WM_stat_beh_eeg_BOSC(tasks{taskInd}, results_temp.twindow{iI}, config_param.chanGroups(Gi), behVars{behInd}, measures{measureInd}, effectInd); % last input is the index of interaction of interest
+                    
+                    for Icont = 1:4 % bonferroni correction by *4 to P-value
+                        if postP(Icont, Fi)*4 <= 0.05
+                            disp([measures{measureInd} ', ' results_temp.twindow{iI} ', ' contNames{Icont} ': p = ' num2str(postP(Icont, Fi)*4, '%.4f') ', F = ' num2str(postFs(Icont, Fi)) ', Df1 = ' num2str(postDF1(Icont, Fi)) ', Df2 = ' num2str(postDF2(Icont, Fi))])
+                        end
+                    end
+                    
+                end
+            end
+        end
+    end
+end
+
 writetable(results_eeg_beh, 'P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\summary_BoSC-beh.xlsx');
 
 %% Visualizations
@@ -223,7 +257,7 @@ end
 
 % 2. Main task stats on powers
 %--------------------------------------------------------------------------
-for Wi = 1:3
+for Wi = [1,2]%1:3
     for Gi = 1:4
         WM_vis_eBOSC('probe', windowTypes{Wi}, config_param.chanGroups(Gi));
     end

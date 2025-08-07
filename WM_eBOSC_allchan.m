@@ -23,7 +23,7 @@ cfg.eBOSC.fsample       = 250;                                              % cu
 
 % padding
 cfg.eBOSC.pad.tfr_s         = 0.5;                                          % padding following wavelet transform to avoid edge artifacts in seconds (bi-lateral)
-cfg.eBOSC.pad.detection_s   = .3;                                           % padding following rhythm detection in seconds (bi-lateral); 'shoulder' for BOSC eBOSC.detected matrix to account for duration threshold
+cfg.eBOSC.pad.detection_s   = 0.5;                                           % padding following rhythm detection in seconds (bi-lateral); 'shoulder' for BOSC eBOSC.detected matrix to account for duration threshold
 cfg.eBOSC.pad.background_s  = 0.5;                                          % padding of segments for BG (only avoiding edge artifacts)
 
 % threshold settings
@@ -64,6 +64,7 @@ for Pi = allParticipants
     boscOutputs{end+1}  = eBOSC;
     
 end
+
 save(fullfile('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\BOSC-allchans', ['BOSC_' condString '_' timeWindow '.mat']), 'boscOutputs', '-v7.3')
 
 end
