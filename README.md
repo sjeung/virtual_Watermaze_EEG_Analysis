@@ -1,4 +1,5 @@
-# Project virtual Morris Water Maze - EEG analysis (work in progress)
+# Project virtual Morris Water Maze - EEG analysis    
+(Documentation work in progress)
 
 This repository contains analysis and visualization scripts for virtual Morris Watermaze data set
 collected 2019-2020 at the Berlin Mobile Brain-Body Imaging Lab, 
@@ -43,4 +44,4 @@ This study was funded by the Deutsche Forschungsgemeinschaft DFG, German Researc
 Tore Knabe supported implemention of the virtual environment   
 
 ## License
-GNU General Public License v2.0
+MIT License
