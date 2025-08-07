@@ -41,4 +41,4 @@ Tore Knabe implemented the virtual environment
 Funding agencies etc?
 
 ## License
-For now the repo is private
+GNU General Public License v2.0
