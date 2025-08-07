@@ -1,4 +1,5 @@
-function [pValVec, omegaSquareds, Fs] = WM_stat_beh_eeg_BOSC(trial, timeWindow, chanGroup, responseVarName, parameter)
+function [pValVec, omegaSquareds, Fs, postP, postBeta, postT, postSE] = WM_stat_beh_eeg_BOSC(trial, timeWindow, chanGroup, responseVarName, parameter, runPosthoc)
+
 
 % EEG features 
 %   FM/PM theta, alpha, beta, gamma
@@ -6,13 +7,24 @@ function [pValVec, omegaSquareds, Fs] = WM_stat_beh_eeg_BOSC(trial, timeWindow, 
 %   Memory score
 %   idPhi
 %   DTW distances
+% Input 
+%       runPosthoc  = 1 : threeway
+%                   = 2 : group power
+%                   = 3 : setup power 
 %--------------------------------------------------------------------------
 
+if ~exist('runPosthoc','var')
+    runPosthoc = false;
+end
+
+
 WM_config
-pThreshold              = 0.005; % 4 electrode groups X 5 waves 
 pValVec                 = NaN(4,5); % 4 tests, 5 frequency bands
 omegaSquareds           = NaN(4,5);
 Fs                      = NaN(4,5);
+
+% post-hoc results 
+postP = NaN(4,5); postBeta = postP; postT = postP; postSE = postP; 
 
 % this needs to match WM_stat_ERSP
 patientIDs      = 81001:81011; 
@@ -97,8 +109,8 @@ pMeans = pMeans';
 
 for Fi = 1:5
     
-    fBandRange = [find(freqAxis >= config_param.FOI_lower(Fi), 1, 'first') , find(freqAxis <= config_param.FOI_upper(Fi), 1,'last')]; 
-  
+    fBandRange = [find(freqAxis >= config_param.FOI_lower(Fi), 1, 'first') , find(freqAxis <= config_param.FOI_upper(Fi), 1,'last')];
+    
     if preLoaded == 0
         for Pi = 1:30
             pEpisodesVec(Pi,Fi) = squeeze(mean(resultsStat.boscOutputs{Pi}.pepisode(:,:,fBandRange(1):fBandRange(2)), [1,2,3]));
@@ -122,17 +134,17 @@ for Fi = 1:5
         % Compute skewness and kurtosis
         skewness_val = skewness(pMeans(:,1));
         kurtosis_val = kurtosis(pMeans(:,1));
-            
+        
         % Apply log transformation if skewness or kurtosis exceed thresholds
         if skewness_val < -2 || skewness_val > 2 || kurtosis_val < -7 || kurtosis_val > 7
             disp('Applying log transformation due to skewness/kurtosis values.');
             demographicsTable.Response  = log(pMeans(:,1));  % Add the response variable to demographicsTable
         else
-           % disp('Non-normal distribution but no correction')
+            % disp('Non-normal distribution but no correction')
             demographicsTable.Response  = pMeans(:,1);
         end
     else
-        demographicsTable.Response  = pMeans(:,1); 
+        demographicsTable.Response  = pMeans(:,1);
     end
     
     lmeFormula = 'Response ~ Power*Group*Setup + Sex + Age + Education + SessionOrder + (1 | ID)';
@@ -144,83 +156,102 @@ for Fi = 1:5
     interaction_setupPower  = lme.Coefficients.pValue(strcmp(lme.Coefficients.Name, 'Setup_2:Power'));
     effect_Power            = lme.Coefficients.pValue(strcmp(lme.Coefficients.Name, 'Power'));
     
-    if interaction_threeway <pThreshold || interaction_groupPower <pThreshold || interaction_setupPower <pThreshold || effect_Power < pThreshold
+    if runPosthoc
+        %       runPosthoc  = 1 : threeway
+        %                   = 2 : group power
+        %                   = 3 : setup power
         
-        groups = unique(demographicsTable.Group);
-        setups = unique(demographicsTable.Setup);
-        f = figure;
-        
-        if strcmp(parameter, 'pepisodes') % inverse logistic for p-episodes
-            ilgPower = 1 ./ (1 + exp(-demographicsTable.Power));
-            power_levels = linspace(min(ilgPower), max(ilgPower), 10);
-        else
-            power_levels = linspace(min(demographicsTable.Power), max(demographicsTable.Power), 10);
-        end
-        
-        hold on;
-        
-        % Loop through each group and setup to create scatter plots
-        for g = 1:length(groups)
-            if g == 1
-                groupColor = config_visual.pColor;
-            else
-                groupColor = config_visual.cColor;
-            end
-            
-            for s = 1:length(setups)
-                % Define marker style based on Setup
-                if s == 1
-                    markerStyle = 'o'; % solid circle for Setup 1
-                    markerFaceColor = groupColor; % Solid color for Setup 1
-                    lineStyle = '-'; % Solid line for Setup 1
-                else
-                    markerStyle = 'o'; % hollow circle for Setup 2
-                    markerFaceColor = 'none'; % Hollow marker for Setup 2
-                    lineStyle = '--'; % Dotted line for Setup 2
-                end
-                
-                % Subset the data for current Group and Setup
-                subset = demographicsTable(demographicsTable.Group == groups(g) & demographicsTable.Setup == setups(s), :);
-                
-                % Apply inverse logit transformation if required
-                if strcmp(parameter, 'pepisodes')
-                    subset.Power = 1 ./ (1 + exp(-subset.Power));
-                end
-                
-                % Scatter plot individual response values vs. power values
-                scatter(subset.Power, subset.Response, 'Marker', markerStyle, 'MarkerEdgeColor', groupColor, ...
-                    'MarkerFaceColor', markerFaceColor, 'LineWidth', 1.5, ...
-                    'DisplayName', sprintf('Group %d, Setup %d', groups(g), setups(s)));
-                
-                % Ensure Power and Response are column vectors
-                xData = subset.Power(:);      % Convert to column vector
-                yData = subset.Response(:);    % Convert to column vector
-                
-                % Fit a linear regression model to the subset data
-                lm = fitlm(xData, yData); % Linear fit
-                
-                % Get the coefficients (intercept and slope)
-                intercept = lm.Coefficients.Estimate(1); % Intercept (b)
-                slope = lm.Coefficients.Estimate(2);     % Slope (m)
-                
-                % Plot the regression line
-                % Generate values for plotting the regression line
-                x_fit = linspace(min(xData), max(xData), 100);
-                y_fit = slope * x_fit + intercept; % y = mx + b
-                
-                % Plot the regression line with the specified line style
-                plot(x_fit, y_fit, 'Color', groupColor, 'LineStyle', lineStyle, 'LineWidth', 1.5, ...
-                    'DisplayName', sprintf('Fit Group %d, Setup %d', groups(g), setups(s)));
-            end
-        end
-        
-        xlabel(parameter); ylabel(responseVarName);
-        title([timeWindow, ', ' chanGroup.key '-' config_param.band_names{Fi}]);
-        grid on; hold off;
-        
-        saveas(f, fullfile('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\bosc_stat', [parameter '_' responseVarName '_' trial '_' timeWindow '_' chanGroup.key '_' config_param.band_names{Fi} '.png']))
+        %switch runPosthoc
+        %             case 1
+        %                 ct1 = [0 0 0 0 0 0 0 1 0 0 0 0]; % mtlr, mobile
+        %                 ct2 = [0 0 0 0 0 0 0 1 0 0 1 0]; % mtlr, stat
+        %                 ct3 = [0 0 0 0 0 0 0 1 0 1 0 0]; % ctrl, mobile
+        %                 ct4 = [0 0 0 0 0 0 0 1 0 0 0 1]; % ctrl, stat
+        %                 %coefTest
+        %
+        %             case 2
+        %                 ct1 = [0 0 0 0 0 0 0 1 0 0 0 0]; % Power for group 1
+        %                 ct2 = [0 0 0 0 0 0 0 1 0 1 0 0]; % Power + Group_2:Power
+        %                 [p_Group1, F_Group1, DF1_Group1, DF2_Group1] = coefTest(lme, ct1);
+        %                 [p_Group2, F_Group2, DF1_Group2, DF2_Group2] = coefTest(lme, ct2);
+        %             case 3
+        %                 ct1 = [0 0 0 0 0 0 0 1 0 0 0 0]; % Power for setup 1
+        %                 ct2 = [0 0 0 0 0 0 0 1 0 0 1 0]; % Power + Group_2:Power
+        %                 [p_Group1, F_Group1, DF1_Group1, DF2_Group1] = coefTest(lme, ct1);
+        %                 [p_Group2, F_Group2, DF1_Group2, DF2_Group2] = coefTest(lme, ct2);
+        %
+        % postP = NaN(4,5); postBeta = postP; postT = postP; postSE = postP;
+        %end
     end
     
+    groups = unique(demographicsTable.Group); setups = unique(demographicsTable.Setup);
+    
+    f = figure;
+    if strcmp(parameter, 'pepisodes') % inverse logistic for p-episodes
+        ilgPower = 1 ./ (1 + exp(-demographicsTable.Power));
+        power_levels = linspace(min(ilgPower), max(ilgPower), 10);
+    else
+        power_levels = linspace(min(demographicsTable.Power), max(demographicsTable.Power), 10);
+    end
+    
+    hold on;
+    
+    % Loop through each group and setup to create scatter plots
+    for g = 1:length(groups)
+        if g == 1
+            groupColor = config_visual.pColor;
+        else
+            groupColor = config_visual.cColor;
+        end
+        
+        for s = 1:length(setups)
+            % Define marker style based on Setup
+            if s == 1
+                markerStyle = 'o'; % solid circle for Setup 1
+                markerFaceColor = groupColor; % Solid color for Setup 1
+                lineStyle = '-'; % Solid line for Setup 1
+            else
+                markerStyle = 'o'; % hollow circle for Setup 2
+                markerFaceColor = 'none'; % Hollow marker for Setup 2
+                lineStyle = '--'; % Dotted line for Setup 2
+            end
+            
+            % Subset the data for current Group and Setup
+            subset = demographicsTable(demographicsTable.Group == groups(g) & demographicsTable.Setup == setups(s), :);
+            
+            % Apply inverse logit transformation if required
+            if strcmp(parameter, 'pepisodes')
+                subset.Power = 1 ./ (1 + exp(-subset.Power));
+            end
+            
+            % Scatter plot individual response values vs. power values
+            scatter(subset.Power, subset.Response, 'Marker', markerStyle, 'MarkerEdgeColor', groupColor, ...
+                'MarkerFaceColor', markerFaceColor, 'LineWidth', 2, 'SizeData', 50, ...
+                'DisplayName', sprintf('Group %d, Setup %d', groups(g), setups(s)));
+            
+            % Ensure Power and Response are column vectors
+            xData = subset.Power(:);  yData = subset.Response(:);
+            
+            % Fit a linear regression model to the subset data
+            lm = fitlm(xData, yData); % Linear fit
+            intercept = lm.Coefficients.Estimate(1); % Intercept (b)
+            slope = lm.Coefficients.Estimate(2);     % Slope (m)
+            
+            % Plot the regression line
+            x_fit = linspace(min(xData), max(xData), 100);
+            y_fit = slope * x_fit + intercept; % y = mx + b
+            
+            % Plot the regression line with the specified line style
+            plot(x_fit, y_fit, 'Color', groupColor, 'LineStyle', lineStyle, 'LineWidth', 2, ...
+                'DisplayName', sprintf('Fit Group %d, Setup %d', groups(g), setups(s)));
+        end
+    end
+    
+    grid on; hold off; ax = gca; ax.FontSize = 15;
+    saveas(f, fullfile('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Figures\bosc_stat', [parameter '_' responseVarName '_' trial '_' timeWindow '_' chanGroup.key '_' config_param.band_names{Fi} '.png']))
+    close(f);
+end
+
     % Total sum of squares (SS_total)
     totalMean = mean(demographicsTable.Response);
     SS_total = sum((demographicsTable.Response - totalMean).^2);
@@ -277,15 +308,15 @@ for Fi = 1:5
     Fs(3, Fi)               = setupPowerFs;
     Fs(4, Fi)               = powerFs;
 
-    if interaction_threeway <pThreshold || interaction_groupPower <pThreshold || interaction_setupPower <pThreshold || effect_Power < pThreshold
+%    if interaction_threeway <pThreshold || interaction_groupPower <pThreshold || interaction_setupPower <pThreshold || effect_Power < pThreshold
       %  disp([responseVarName, ', ' timeWindow,',' chanGroup.key '-' bandNames{Fi}])
       %  disp(['3-way interaction p = ' num2str(interaction_threeway)])
       %  disp(['Group interaction p = ' num2str(interaction_groupPower) ', setup intraction p = ' num2str(interaction_setupPower)])
       %  disp(['Power main effect p = ' num2str(effect_Power)])
-    end
+ %   end
  
 end
 
 
-end
+%end
 

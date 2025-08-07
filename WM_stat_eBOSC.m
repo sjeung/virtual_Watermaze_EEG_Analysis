@@ -150,9 +150,9 @@ for Fi = 1:numel(config_param.band_names)
     df_Interaction = 1;  % Interaction of two binary factors
     
     % Step 3: Compute Omega Squared (ω²)
-    groupOS     = (SS_Group - df_Group * MS_error) / (SS_total + MS_error);
-    setupOS = (SS_Setup - df_Setup * MS_error) / (SS_total + MS_error);
-    interactionOS = (SS_Interaction - df_Interaction * MS_error) / (SS_total + MS_error);
+    groupOS         = (SS_Group - df_Group * MS_error) / (SS_total + MS_error);
+    setupOS         = (SS_Setup - df_Setup * MS_error) / (SS_total + MS_error);
+    interactionOS   = (SS_Interaction - df_Interaction * MS_error) / (SS_total + MS_error);
     
     groupFs     = (SS_Group / df_Group) / MS_error;
     setupFs = (SS_Setup / df_Setup) / MS_error;
@@ -235,4 +235,5 @@ grid on; hold off;
 
 saveas(f, fullfile(config_folder.figures_folder, 'bosc_stat', ['BOSC_' parameter '_' trial '_' chanGroup.key  '_' timeWindow '.png']));
 save(fullfile('P:\Sein_Jeung\Project_Watermaze\WM_EEG_Results\BOSC', ['BOSC-comp_' trial '_' timeWindow '_' chanGroup.key '.mat']), 'pEpisodesVec', 'bandpowerVec', 'freqAxis', 'omegaSquareds', 'Fs');
+
 end
