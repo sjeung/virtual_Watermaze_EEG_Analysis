@@ -8,7 +8,6 @@ function WM_05_epoch_truncated(Pi)
 WM_config;                                                                  % load configs
 
 trialTypes                          = {'learn', 'probe'};
-baselineTrialTypes                  = {'stand', 'walk'};
 sessions                            = {'mobi', 'stat'};
 epochWidth                          = 3; % in seconds
 timeBuffer                          = 1;                                    % in seconds (trials will be cut with -buffer, +buffer around the edge events)
@@ -36,9 +35,6 @@ assert(numel(standingStarts) == numel(standingEnds));
 assert(numel(walkingStarts) == numel(walkingEnds));
 assert(numel(standingStarts) == 6);
 assert(numel(walkingStarts) == 6);
-
-standingTrials  = [EEG.event(standingStarts).latency; EEG.event(standingEnds).latency];     % 2 x N vector consisting of start and end indices
-walkingTrials   = [EEG.event(walkingStarts).latency; EEG.event(walkingEnds).latency];       % 2 x N vector consisting of start and end indices
 
 % extract trials
 lStarts         = find(contains({EEG.event.type}, 'searchtrial:start'));

@@ -11,10 +11,6 @@ WM_config;
 sRate                   = 250;
 [erspFileName,erspFileDir] = assemble_file(config_folder.results_folder, config_folder.ersp_folder, ['_' condText], Pi);
 
-if ~isfolder(fullfile(erspFileDir, 'trial_ERSPs'))
-    mkdir(fullfile(erspFileDir, 'trial_ERSPs'))
-end
-
 % copy structs
 ERSPStart       = ERSP; 
 ERSPEnd         = ERSP; 
@@ -80,23 +76,6 @@ cfg.colorbar    = 'yes';  % Display colorbar
 cfg.zlim        = [0,4];
 cfg.figure      = 'gcf';
 
-% for Ti = 1:size(ERSP.powspctrm, 1)
-%     f = figure;
-%     cfg.trials = Ti; 
-% 
-%     subplot(1,2,1)
-%     ft_singleplotTFR(cfg, ERSPStart); 
-%     title('first 5 sec', 'FontSize', 15)
-% 
-%     subplot(1,2,2)
-%     ft_singleplotTFR(cfg, ERSPEnd);
-%     title('last 5 sec', 'FontSize', 15)
-%     set(gcf,'Position',[100 100 2500 500])
-%     
-%     saveas(f, fullfile(erspFileDir, 'trial_ERSPs', ['sub-' num2str(Pi) '_' condText '_trial-' num2str(Ti) '_ERSP.png']))
-%     close(f);
-% end
-
 f = figure; 
 cfg.trials          = 'all';
 ERSPStart.label     = {condText(end-1:end)};
@@ -104,7 +83,6 @@ ERSPMid.label       = {condText(end-1:end)};
 ERSPEnd.label       = {condText(end-1:end)};
 
 % Add a new dimension to powspctrm for channel
-% Add a new dimension to powspctrm for ERSPStart
 ERSPStart.powspctrm = reshape(ERSPStart.powspctrm, [size(ERSPStart.powspctrm, 1), 1, size(ERSPStart.powspctrm, 2), size(ERSPStart.powspctrm, 3)]);
 ERSPMid.powspctrm = reshape(ERSPMid.powspctrm, [size(ERSPMid.powspctrm, 1), 1, size(ERSPMid.powspctrm, 2), size(ERSPMid.powspctrm, 3)]);
 ERSPEnd.powspctrm = reshape(ERSPEnd.powspctrm, [size(ERSPEnd.powspctrm, 1), 1, size(ERSPEnd.powspctrm, 2), size(ERSPEnd.powspctrm, 3)]);
@@ -113,25 +91,21 @@ ERSPStart.dimord = 'rpt_chan_freq_time';
 ERSPMid.dimord = 'rpt_chan_freq_time';
 ERSPEnd.dimord = 'rpt_chan_freq_time';
 
-
-subplot(1,2,1)
+subplot(1,3,1)
 ft_singleplotTFR(cfg, ERSPStart);
 title('Onset', 'FontSize', 15)
 
-subplot(1,2,2)
+subplot(1,3,2)
 ft_singleplotTFR(cfg, ERSPEnd);
 title('Offset', 'FontSize', 15)
+
+subplot(1,3,3)
+cfg.trials      = 'all';
+ft_singleplotTFR(cfg, ERSPMid);
+title('Mid', 'FontSize', 15)
 set(gcf,'Position',[100 100 2500 500])
 
 saveas(f, fullfile(erspFileDir, ['sub-' num2str(Pi) '_' condText '_ERSP.png']))
-close(f);
-
-
-f = figure; 
-cfg.trials      = 'all';
-ft_singleplotTFR(cfg, ERSPMid);
-title('Mid Trial', 'FontSize', 15)
-saveas(f, fullfile(erspFileDir, ['sub-' num2str(Pi) '_' condText '_ERSP_Mid.png']))
 close(f);
 
 
