@@ -18,7 +18,6 @@ Data directory is to be configured in ... WM_EEG_main.m calls other scripts ... 
 	fixed by replacing it with dummy stream in import  
 83004 : broken recordings  
 81005/82005/83005 : excluded due to development of symptoms that meet exclusion critera in the patient  
-81008/82008/83008 : excluded due to bad data quality (strong spectral artefacts) in the patient  
 
 ### Availability
 
@@ -40,7 +39,6 @@ Christoph Ploner (CHARITE), Carsten Finke (CHARITE), Klaus Gramann (TUB) supervi
 ### Acknowledgements
 Tore Knabe implemented the virtual environment   
 Funding agencies etc?
-
 
 ## License
 For now the repo is private
