@@ -1,47 +1,54 @@
-# Project virtual Morris Water Maze - EEG analysis    
-(Documentation work in progress)
+# Project virtual Morris Water Maze : EEG analysis  
 
 This repository contains analysis and visualization scripts for virtual Morris Watermaze data set
 collected 2019-2020 at the Berlin Mobile Brain-Body Imaging Lab, 
 in collaboration between TU Berlin department of Biopsychology and Neuroergonomics and Charite department of Neurology.
-The batch of Matlab script performs preprocessing of the EEG data and ERS/ERDS analysis alongside the analysis of motion capture data.
-Data set contains 128 channels EEG data (BrainProducts) collected alongside HTC-Vive motion captuer of HMD, Torso, and both feet.
+The batch of Matlab script performs preprocessing of the EEG data and eBOSC analysis, to capture the oscillatory scalp EEG activity during active navigation. The results are to be reported in a manuscript in preparation (citation to be added upon acceptance). The analysis results on the motion data were published in Iggena et al. (2023, see below for full citation).    
+  
+The data set contains 128 channels EEG data (BrainProducts MOVE) collected alongside HTC-Vive motion captuer of HMD, Torso, and both feet.
 10 patients with right medial-temporal lesions and navigated in mobile immersive VR environment and simulated desktop-based environment 
-performing a human-scale variant of the Morris Water Maze task. Two matched controls with comparable age, sex, and education level for each patient performed the same task (N controls = 20). 
+performing a human-scale variant of the Morris Water Maze task. 
+Two matched controls with comparable age, sex, and education level for each patient performed the same task (N controls = 20). 
 
-## How to use the scripts
-Data directory is to be configured in ... WM_EEG_main.m calls other scripts ... (Work in progress) 
+## How to use the scripts    
+Modify *WM_config.m* and *WM_bemobil_config.m* to configure paths    
+Script *WM_main.m* executes the preprocessing and extraction of p-episodes using eBOSC    
+*statistics/LMEs.R* and *statistics/LEMs_BEH.R* scripts implments the statistical analysis of the results    
 
-## Notes on data set   
-82002 : run index issues  
-82009 : excluded due to nausea  
-82010 : first half of desktop session (desktop_B_rec1.xdf) misses HMD stream  
-	fixed by replacing it with dummy stream in import  
-83004 : broken recordings  
-81005/82005/83005 : excluded due to development of symptoms that meet exclusion critera in the patient  
+## Dependencies 
+- Matlab 2021  
+- EEGLAB v14.1.0
+- FieldTrip 20230309
+- [eBOSC](https://github.com/jkosciessa/eBOSC)
+- R v4.4.2
 
 ## Data Availability
 BOSC results are available on [OSF](https://osf.io/3jv78/).
 
-## Dependencies (WIP)
-Matlab   
-EEGLAB  
-FieldTrip  
-eBOSC
-... 
+## Author contributions
+Sein Jeung+, Deetje Iggena+, Berrak Hosgoren, Patrizia M. Maier, Christoph J. Ploner, Carsten Finke*, & Klaus Gramann*    
++,* : equal contributions
+  
+- Conceptualization: D.I., S.J., K.G., C.J.P., and C.F.; Methodology: D.I., S.J., K.G.
+- Participant recruitment: D.I., C.J.P., and C.F.    
+- Data acquisition: D.I., S.J., and P.M.M.    
+- Data analysis: S.J., D.I. and B.H.    
+- Statistical analysis: S.J., and D.I.    
+- Visualization: S.J. and D.I.    
+- Supervision: C.J.P., C.F., and K.G.    
+- Writing—original draft: S.J.    
+- Writing—review & editing: S.J., D.I., P.M.M., K.G., C.F., C.J.P., and K.G.    
+- Technical equipment: K.G.; Funding: C.J.P. and C.F. All authors approved the final manuscript.
 
-## Authors (role assignments are tentative)
-Sein Jeung (TUB) collected the data, implemented the EEG analysis.    
-Deetje Iggena (CHARITE) collected the data, evaluated the analysis results.    
-Partizia Maier (CHARITE) supported data collection and provided theoretical feedback.   
-Berrak Hosgoren (Uni Padova) supported EEG preprocessing and initial evaluation of data quality.   
-Christoph Ploner (CHARITE), Carsten Finke (CHARITE), Klaus Gramann (TUB) supervised the project, were involved in conception of the project as well as provided theoretical feedback. 
+## Related publication
+Iggena, D., Jeung, S., Maier, P.M. et al. Multisensory input modulates memory-guided spatial navigation in humans. Commun Biol 6, 1167 (2023). https://doi.org/10.1038/s42003-023-05522-6
 
-### Funding
+## Funding
 This study was funded by the Deutsche Forschungsgemeinschaft DFG, German Research Foundation—Project number 327654276—SFB 1315
 
-### Acknowledgements
-Tore Knabe supported implemention of the virtual environment   
+## Acknowledgements
+We thank Tore Knabe for supporting implemention of the virtual environment.    
+We thank Yiru Chen and Timotheus Berg for assisting data collection.    
 
 ## License
 MIT License
